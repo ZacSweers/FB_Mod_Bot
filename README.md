@@ -17,7 +17,7 @@ The group is a sublets/roommate finding group for students at my university, whe
 
 ### The bot has three major validation checks:
 * Pricing reference
-  * There must be some sort of pricing referenced, either with `$` signs or by saying `____/month`
+  * There must be some sort of pricing referenced, either with `$` signs or by saying `____/month` or `____ per month`
 * Minimum length or craigslist link
   * If their post is under 200 characters and doesn't have a link to a craiglist ad, then they need to edit and include more details.
 * Proper tag
