@@ -67,6 +67,7 @@ def init_props():
     test_dict = {'sublets_oauth_access_token': "put-auth-token-here",
                  'sublets_api_id': "put-app-id-here",
                  'sublets_secret_key': "put-secret-key-here",
+                 'group_id': 'put-group-id-here',
                  'ignored_post_ids': [],
                  'ignore_source_ids': []}
     save_properties(test_dict)
