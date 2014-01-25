@@ -228,8 +228,8 @@ def sub_group():
             continue
 
         # Log the message details
-        log("\n" + post_message[0:80].strip('\n') + "...\n--POST ID: " + str(
-            post_id) + "\n--ACTOR ID: " + str(actor_id))
+        log("\n" + post_message[0:75].replace('\n', "") + "...\n--POST ID: " +
+            str(post_id) + "\n--ACTOR ID: " + str(actor_id))
 
         # Check for pricing
         if "$" not in post_message and "/month" not in post_message and \
