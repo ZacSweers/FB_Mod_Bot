@@ -46,14 +46,15 @@ def set_new_props():
 
     #### Uncomment lines below as needed to manually set stuff ####
 
+    #### These are strings
     # saved_dict['sublets_oauth_access_token'] = "put-auth-token-here"
     # saved_dict['sublets_api_id'] = "put-app-id-here"
     # saved_dict['sublets_secret_key'] = "put-secret-key-here"
     # saved_dict['access_token_expiration'] = "put-access-token-expiration-here"
     # saved_dict['group_id'] = "put-group-id-here"
 
-    #### Uncomment lines below as needed to manually add id's ####
-
+    #### These are ints
+    # saved_dict['bot_id'] = put-bot-id-here
     # saved_dict['ignored_post_ids'].append(<id_num>)
     # saved_dict['ignore_source_ids'].append(<id_num>)
 
@@ -68,6 +69,7 @@ def init_props():
                  'sublets_api_id': "put-app-id-here",
                  'sublets_secret_key': "put-secret-key-here",
                  'group_id': 'put-group-id-here',
+                 'bot_id': -1,
                  'ignored_post_ids': [],
                  'ignore_source_ids': []}
     save_properties(test_dict)
@@ -151,6 +153,9 @@ def sub_group():
 
     # ID of the FB group
     group_id = saved_props['group_id']
+
+    # User ID of the bot
+    bot_id = saved_props['bot_id']
 
     # FQL query for the group
     group_query = "SELECT post_id, message, actor_id FROM stream WHERE " + \
@@ -291,7 +296,7 @@ def sub_group():
                 for comment in comments:
 
                     # Found a comment from the bot
-                    if comment['fromid'] == ignore_source_ids[0]:
+                    if comment['fromid'] == bot_id:
                         log('--Previously warned')
                         log('----caching')
                         previously_commented = True
@@ -317,7 +322,7 @@ def sub_group():
                                  " WHERE post_id=\"" + str(post_id) + "\""
                 comments = graph.fql(comments_query)
                 for comment in comments:
-                    if comment['fromid'] == ignore_source_ids[0]:
+                    if comment['fromid'] == bot_id:
                         # Delete warning comment
                         graph.delete_object(comment['id'])
                         log('--Warning deleted')
