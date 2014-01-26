@@ -17,8 +17,14 @@ time_limit = 86400
 # Pickle cache file caching warned posts
 db_file = "fb_subs_cache"
 
+# Pickle cache file caching valid posts
+valid_db_file = "fb_subs_valid_cache"
+
 # Pickle cache file for properties
 prop_file = "login_prop"
+
+# Boolean for key extensions
+extend_key = False
 
 
 # Color class, used for colors in terminal
@@ -174,11 +180,16 @@ def sub_group():
         log("-- Expires on " + datetime.datetime.fromtimestamp(
             access_token_expiration).strftime('%Y-%m-%d %H:%M:%S'))
 
+        # If you want it to automatically when it's close to exp.
+        global extend_key
+        extend_key = True
+
     # Log in, try to get posts
     graph = facebook.GraphAPI(sublets_oauth_access_token)
 
     # Extend the access token, default is ~2 months from current date
     if extend_key:
+        log("Extending access token", Color.BOLD)
         result = graph.extend_access_token(sublets_api_id, sublets_secret_key)
         new_token = result['access_token']
         new_time = int(result['expires']) + now_time
@@ -193,7 +204,7 @@ def sub_group():
 
     # Load the pickled cache of previously warned posts
     already_warned = dict()
-    log("Checking cache...", Color.BOLD)
+    log("Loading warned cache", Color.BOLD)
     if os.path.isfile(db_file):
         with open(db_file, 'r+') as f:
 
@@ -201,9 +212,23 @@ def sub_group():
             if f.tell() != os.fstat(f.fileno()).st_size:
                 already_warned = pickle.load(f)
     else:
-        log("No cache file found, a new one will be created", Color.BLUE)
+        log("--No cache file found, a new one will be created", Color.BLUE)
 
-    log('(Cache size: ' + str(len(already_warned)) + ")", Color.BOLD)
+    log('--Loading cache size: ' + str(len(already_warned)), Color.BOLD)
+
+    # Load the pickled cache of valid posts
+    valid_posts = []
+    log("Checking valid cache.", Color.BOLD)
+    if os.path.isfile(valid_db_file):
+        with open(valid_db_file, 'r+') as f:
+
+            # If the file isn't at its end or empty
+            if f.tell() != os.fstat(f.fileno()).st_size:
+                valid_posts = pickle.load(f)
+    else:
+        log("--No cache file found, a new one will be created", Color.BLUE)
+
+    log('--Valid cache size: ' + str(len(valid_posts)), Color.BOLD)
 
     # Loop over retrieved posts
     for post in group_posts:
@@ -215,17 +240,18 @@ def sub_group():
         # Unique ID of the person that posted it
         actor_id = post['actor_id']
 
+         # Ignore mods and certain posts
+        if post_id in ignored_post_ids or actor_id in ignore_source_ids or \
+                post_id in valid_posts:
+            # log('\n--Ignored post: ' + post_id, Color.BLUE)
+            continue
+
         # Data to use
         post_comment = "(This is an automated comment)\n\nIt looks like" + \
                        " your post has a few issues:\n"
 
         # Boolean for tracking if the post is valid
         valid_post = True
-
-        # Ignore mods and certain posts
-        if post_id in ignored_post_ids or actor_id in ignore_source_ids:
-            log('\n--Ignored post: ' + post_id, Color.BOLD)
-            continue
 
         # Log the message details
         log("\n" + post_message[0:75].replace('\n', "") + "...\n--POST ID: " +
@@ -315,6 +341,10 @@ def sub_group():
         else:
             log('--VALID', Color.GREEN)
 
+            # Add to valid posts cache
+            valid_posts.append(post_id)
+            log('----caching', Color.GREEN)
+
             # Remove warning comment if it's valid now
             if post_id in already_warned:
                 log('--Removing any warnings')
@@ -331,10 +361,14 @@ def sub_group():
                 log('--Removing from cache')
                 del already_warned[post_id]
 
-    # Save the updated cache
-    log('Saving cache', Color.BOLD)
-    with open(db_file, 'r+') as f:
+    # Save the updated caches
+    log('Saving warned cache', Color.BOLD)
+    with open(db_file, 'w+') as f:
         pickle.dump(already_warned, f)
+
+    log('Saving valid cache', Color.BOLD)
+    with open(valid_db_file, 'w+') as f:
+        pickle.dump(valid_posts, f)
 
     save_properties(saved_props)
     notify_mac()
@@ -343,7 +377,6 @@ def sub_group():
 # Main method
 if __name__ == "__main__":
     args = sys.argv
-    extend_key = False
 
     # Arg parsing. I know, there's better ways to do this
     if len(args) > 1:

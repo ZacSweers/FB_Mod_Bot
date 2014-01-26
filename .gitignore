@@ -38,6 +38,7 @@ nosetests.xml
 # Prop and cache files
 login_prop
 fb_subs_cache
+fb_subs_valid_cache
 
 # PyCharm
 *.xml
