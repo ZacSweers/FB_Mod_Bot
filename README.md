@@ -24,7 +24,7 @@ The group is a sublets/roommate finding group for students at my university, whe
   * For easy searching, we require them to prepend their post with `[LOOKING]`, `[OFFERING]`, or `[ROOMING]`.
   * The bot is purposefully a little fuzzy on this due to the large number of people that can't find the bracket keys on their keyboards ಠ_ಠ
 
-If any of those checks fail, it comments on the user notifying them of the problem(s) and specifies what it(they) are. Upon warning, it caches the post ID and time, giving them 24 hours to fix their post. On later runs, if a previously warned post is now valid, it removes the warning comment and the post ID from the cache. I'd send a message thanking them too, but Facebook's API doesn't allow apps to send messages.
+If any of those checks fail, it comments on the user notifying them of the problem(s) and specifies what it(they) are. Upon warning, it caches the post ID and time, giving them 24 hours to fix their post. On later runs, if a previously warned post is now valid, it removes the warning comment and the post ID from the cache. ~~I'd send a message thanking them too, but Facebook's API doesn't allow apps to send messages.~~ Yay XMPP
 
 ### TODO
 * Prepare for Heroku hosting
