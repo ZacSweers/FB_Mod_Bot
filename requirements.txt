@@ -1,1 +1,2 @@
 facebook-sdk==0.4.0
+sleekxmpp==1.1.11

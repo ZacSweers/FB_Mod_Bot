@@ -6,6 +6,7 @@ import facebook
 import time
 import subprocess
 import sys
+from fbxmpp import SendMsgBot
 
 __author__ = 'Henri Sweers'
 
@@ -44,6 +45,26 @@ class Color:
 # Junk method that I use for testing stuff periodically
 def test():
     log('Test', Color.PURPLE)
+
+
+# Method for sending messages, adapted from here: http://goo.gl/oV5KtZ
+def send_message(to, botid, message, api_key, access_token):
+    # The "From" Facebook ID
+    jid = to + '@chat.facebook.com'
+
+    # The "Recipient" Facebook ID, with a hyphen for some reason
+    to = '-' + botid + '@chat.facebook.com'
+
+    xmpp = SendMsgBot(jid, to, unicode(message))
+
+    xmpp.credentials['api_key'] = api_key
+    xmpp.credentials['access_token'] = access_token
+
+    if xmpp.connect(('chat.facebook.com', 5222)):
+        xmpp.process(block=True)
+        log('----Message sent', Color.GREEN)
+    else:
+        log("----Unable to connect, message sending fail", Color.RED)
 
 
 # Use this method to set new vals for props, such as on your first run
@@ -356,6 +377,13 @@ def sub_group():
                         # Delete warning comment
                         graph.delete_object(comment['id'])
                         log('--Warning deleted')
+
+                        log('--Thanking user')
+                        send_message(str(actor_id), str(bot_id),
+                                     "Thank you for fixing your post," +
+                                     " I have removed the warning comment.",
+                                     str(sublets_api_id),
+                                     str(sublets_oauth_access_token))
 
                 # Remove post from list of warned people
                 log('--Removing from cache')
