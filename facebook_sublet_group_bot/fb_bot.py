@@ -314,6 +314,9 @@ def sub_group():
                     url = "http://www.facebook.com/" + post_id
                     webbrowser.open_new_tab(url)
                     del already_warned[post_id]
+
+                    # TODO If on heroku, can message admin with url instead
+
                 else:
                     time_delta = time_limit - (now_time -
                                                already_warned[post_id])
