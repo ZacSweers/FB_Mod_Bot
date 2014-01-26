@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import cPickle as pickle
 import webbrowser
@@ -27,6 +29,9 @@ prop_file = "login_prop"
 # Boolean for key extensions
 extend_key = False
 
+# Boolean for checking heroku
+running_on_heroku = False
+
 
 # Color class, used for colors in terminal
 class Color:
@@ -48,12 +53,12 @@ def test():
 
 
 # Method for sending messages, adapted from here: http://goo.gl/oV5KtZ
-def send_message(to, botid, message, api_key, access_token):
+def send_message(recipient, botid, message, api_key, access_token):
     # The "From" Facebook ID
-    jid = to + '@chat.facebook.com'
+    jid = botid + '@chat.facebook.com'
 
     # The "Recipient" Facebook ID, with a hyphen for some reason
-    to = '-' + botid + '@chat.facebook.com'
+    to = '-' + recipient + '@chat.facebook.com'
 
     xmpp = SendMsgBot(jid, to, unicode(message))
 
@@ -84,6 +89,7 @@ def set_new_props():
     # saved_dict['bot_id'] = put-bot-id-here
     # saved_dict['ignored_post_ids'].append(<id_num>)
     # saved_dict['ignore_source_ids'].append(<id_num>)
+    # saved_dict['admin_ids'].append(<id_num>)
 
     #### You can do other stuff too, the above are just examples ####
 
@@ -98,7 +104,8 @@ def init_props():
                  'group_id': 'put-group-id-here',
                  'bot_id': -1,
                  'ignored_post_ids': [],
-                 'ignore_source_ids': []}
+                 'ignore_source_ids': [],
+                 'admin_ids': []}
     save_properties(test_dict)
     saved_dict = load_properties()
     assert test_dict == saved_dict
@@ -118,6 +125,25 @@ def load_properties():
             return data
     else:
         sys.exit("No prop file found")
+
+
+# Method for loading a cache. Either returns cached values or original data
+def load_cache(filename, data):
+    if os.path.isfile(filename):
+        with open(filename, 'r+') as f:
+
+            # If the file isn't at its end or empty
+            if f.tell() != os.fstat(f.fileno()).st_size:
+                return pickle.load(f)
+    else:
+        log("--No cache file found, a new one will be created", Color.BLUE)
+        return data
+
+
+# Method for saving to cache
+def save_cache(filename, data):
+    with open(filename, 'w+') as f:
+        pickle.dump(data, f)
 
 
 # Nifty method for sending notifications on my mac when it's done
@@ -154,6 +180,18 @@ def check_tag_validity(message_text):
     return False
 
 
+# Method for extending access token
+def extend_access_token(graph, now_time, saved_props, sublets_api_id,
+                        sublets_secret_key):
+    log("Extending access token", Color.BOLD)
+    result = graph.extend_access_token(sublets_api_id, sublets_secret_key)
+    new_token = result['access_token']
+    new_time = int(result['expires']) + now_time
+    saved_props['sublets_oauth_access_token'] = new_token
+    saved_props['access_token_expiration'] = new_time
+    log("Token extended", Color.BOLD)
+
+
 # Main runner method
 def sub_group():
 
@@ -184,6 +222,9 @@ def sub_group():
     # User ID of the bot
     bot_id = saved_props['bot_id']
 
+    # IDs of admins to notify about deleting a post
+    admin_ids = saved_props['admin_ids']
+
     # FQL query for the group
     group_query = "SELECT post_id, message, actor_id FROM stream WHERE " + \
                   "source_id=" + group_id + " LIMIT 50"
@@ -210,15 +251,8 @@ def sub_group():
 
     # Extend the access token, default is ~2 months from current date
     if extend_key:
-        log("Extending access token", Color.BOLD)
-        result = graph.extend_access_token(sublets_api_id, sublets_secret_key)
-        new_token = result['access_token']
-        new_time = int(result['expires']) + now_time
-
-        saved_props['sublets_oauth_access_token'] = new_token
-        saved_props['access_token_expiration'] = new_time
-
-        log("Token extended", Color.BOLD)
+        extend_access_token(graph, now_time, saved_props, sublets_api_id,
+                            sublets_secret_key)
 
     # Make our first request, get the group posts
     group_posts = graph.fql(query=group_query)
@@ -226,29 +260,13 @@ def sub_group():
     # Load the pickled cache of previously warned posts
     already_warned = dict()
     log("Loading warned cache", Color.BOLD)
-    if os.path.isfile(db_file):
-        with open(db_file, 'r+') as f:
-
-            # If the file isn't at its end or empty
-            if f.tell() != os.fstat(f.fileno()).st_size:
-                already_warned = pickle.load(f)
-    else:
-        log("--No cache file found, a new one will be created", Color.BLUE)
-
+    already_warned = load_cache(db_file, already_warned)
     log('--Loading cache size: ' + str(len(already_warned)), Color.BOLD)
 
     # Load the pickled cache of valid posts
     valid_posts = []
     log("Checking valid cache.", Color.BOLD)
-    if os.path.isfile(valid_db_file):
-        with open(valid_db_file, 'r+') as f:
-
-            # If the file isn't at its end or empty
-            if f.tell() != os.fstat(f.fileno()).st_size:
-                valid_posts = pickle.load(f)
-    else:
-        log("--No cache file found, a new one will be created", Color.BLUE)
-
+    valid_posts = load_cache(valid_db_file, valid_posts)
     log('--Valid cache size: ' + str(len(valid_posts)), Color.BOLD)
 
     # Loop over retrieved posts
@@ -309,14 +327,26 @@ def sub_group():
             # If already warned, delete if it's been more than 24 hours, ignore
             # if it's been less
             if post_id in already_warned:
+
+                # Invalid, past 24 hour grace period
                 if time_limit < now_time - already_warned[post_id]:
                     log('--Delete: ' + post_id, Color.RED)
                     url = "http://www.facebook.com/" + post_id
-                    webbrowser.open_new_tab(url)
-                    del already_warned[post_id]
 
-                    # TODO If on heroku, can message admin with url instead
+                    # If local, just open it in a new browser tab
+                    if not running_on_heroku:
+                        webbrowser.open_new_tab(url)
+                        del already_warned[post_id]
 
+                    # Otherwise message the admins the URL of the post to delete
+                    else:
+                        for i in admin_ids:
+                            send_message(str(i), str(bot_id),
+                                         "Delete this post: " + url,
+                                         str(sublets_api_id),
+                                         str(sublets_oauth_access_token))
+
+                # Invalid but they still have time
                 else:
                     time_delta = time_limit - (now_time -
                                                already_warned[post_id])
@@ -332,13 +362,8 @@ def sub_group():
             # Comment with a warning and cache the post
             else:
 
-                # Should check to make sure the bot hasn't posted before
-                post_comment += \
-                    "\nPlease edit your post and fix the above within 24" + \
-                    " hours, or else your post will be deleted per the" + \
-                    " group rules. Thanks!\n\n(If you think this was a" + \
-                    " mistake don't hesitate to message me)"
-
+                # First check to make sure we haven't warned them before
+                # by searching comments for bot comment
                 previously_commented = False
                 comments_query = "SELECT fromid, id, time FROM comment" + \
                                  " WHERE post_id=\"" + str(post_id) + "\""
@@ -355,6 +380,14 @@ def sub_group():
 
                 # Comment if no previous comment
                 if not previously_commented:
+
+                    # Comment to post for warning
+                    post_comment += \
+                        "\nPlease edit your post and fix the above within 24" +\
+                        " hours, or else your post will be deleted per the" + \
+                        " group rules. Thanks!\n\n(If you think this was a" + \
+                        " mistake don't hesitate to message me)"
+
                     graph.put_object(
                         post['post_id'], "comments", message=post_comment)
                     # Save
@@ -377,10 +410,13 @@ def sub_group():
                 comments = graph.fql(comments_query)
                 for comment in comments:
                     if comment['fromid'] == bot_id:
+
                         # Delete warning comment
                         graph.delete_object(comment['id'])
                         log('--Warning deleted')
 
+                        # Message the user notifying them the comment is deleted
+                        # and thank them for fixing their post
                         log('--Thanking user')
                         send_message(str(actor_id), str(bot_id),
                                      "Thank you for fixing your post," +
@@ -394,20 +430,33 @@ def sub_group():
 
     # Save the updated caches
     log('Saving warned cache', Color.BOLD)
-    with open(db_file, 'w+') as f:
-        pickle.dump(already_warned, f)
+    save_cache(db_file, already_warned)
 
     log('Saving valid cache', Color.BOLD)
-    with open(valid_db_file, 'w+') as f:
-        pickle.dump(valid_posts, f)
+    save_cache(valid_db_file, valid_posts)
 
     save_properties(saved_props)
+
+    # Done
     notify_mac()
 
 
 # Main method
 if __name__ == "__main__":
     args = sys.argv
+
+    # Check to see if we're running on Heroku
+    if os.environ.get('MEMCACHEDCLOUD_SERVERS', None):
+        import bmemcached
+
+        log('Running on heroku, using memcached', Color.BOLD)
+
+        # Authenticate Memcached
+        running_on_heroku = True
+        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').
+                               split(','),
+                               os.environ.get('MEMCACHEDCLOUD_USERNAME'),
+                               os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
 
     # Arg parsing. I know, there's better ways to do this
     if len(args) > 1:
