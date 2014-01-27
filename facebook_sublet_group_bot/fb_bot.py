@@ -479,7 +479,10 @@ if __name__ == "__main__":
 
         # Authenticate Memcached
         running_on_heroku = True
-        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').split(','), os.environ.get('MEMCACHEDCLOUD_USERNAME'), os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
+        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').
+                               split(','),
+                               os.environ.get('MEMCACHEDCLOUD_USERNAME'),
+                               os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
 
     args = sys.argv
     # parser = argparse.ArgumentParser()
