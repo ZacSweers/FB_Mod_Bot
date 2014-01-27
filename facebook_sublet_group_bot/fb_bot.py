@@ -462,8 +462,6 @@ def sub_group():
 
 # Main method
 if __name__ == "__main__":
-    args = sys.argv
-
     # Check to see if we're running on Heroku
     if os.environ.get('MEMCACHEDCLOUD_SERVERS', None):
         import bmemcached
@@ -471,13 +469,13 @@ if __name__ == "__main__":
         log('Running on heroku, using memcached', Color.BOLD)
 
         # Authenticate Memcached
-        global running_on_heroku
         running_on_heroku = True
         mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').
                                split(','),
                                os.environ.get('MEMCACHEDCLOUD_USERNAME'),
                                os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
 
+    args = sys.argv
     # parser = argparse.ArgumentParser()
     # parser.add_argument("-e", help="extend the access token on run")
     # parser.add_argument("-i", help="initialize properties")
