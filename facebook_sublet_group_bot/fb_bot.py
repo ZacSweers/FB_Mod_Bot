@@ -57,14 +57,6 @@ running_on_heroku = False
 # Junk method that I use for testing stuff periodically
 def test():
     log('Test', Color.PURPLE)
-    log('Props cache', Color.GREEN)
-    print load_properties()
-
-    log('Warned cache', Color.GREEN)
-    print load_cache(warned_db, [])
-
-    log('Valid cache', Color.GREEN)
-    print load_cache(valid_db, {})
 
 
 # Method for sending messages, adapted from here: http://goo.gl/oV5KtZ
