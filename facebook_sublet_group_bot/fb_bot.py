@@ -61,7 +61,7 @@ def test():
     print load_properties()
 
     log('Warned cache', Color.GREEN)
-    print load_cache(warned_db)
+    print load_cache(warned_db, [])
 
     log('Valid cache', Color.GREEN)
     print load_cache(valid_db, {})
