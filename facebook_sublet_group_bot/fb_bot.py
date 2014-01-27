@@ -50,9 +50,6 @@ prop_file = "login_prop"
 # Boolean for key extensions
 extend_key = False
 
-# Boolean for checking heroku
-running_on_heroku = False
-
 
 # Junk method that I use for testing stuff periodically
 def test():
@@ -462,8 +459,11 @@ def sub_group():
 
 # Main method
 if __name__ == "__main__":
+
+    # Boolean for checking heroku
+    running_on_heroku = False
+
     # Check to see if we're running on Heroku
-    global running_on_heroku
     if os.environ.get('MEMCACHEDCLOUD_SERVERS', None):
         import bmemcached
 
