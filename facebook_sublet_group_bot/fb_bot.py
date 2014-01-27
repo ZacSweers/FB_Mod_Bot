@@ -12,6 +12,27 @@ from fbxmpp import SendMsgBot
 
 __author__ = 'Henri Sweers'
 
+# Color class, used for colors in terminal
+class Color:
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m'
+    DARKCYAN = '\033[36m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    END = '\033[0m'
+
+
+# Log method. If there's a color argument, it'll stick that in first
+def log(message, *colorargs):
+    if len(colorargs) > 0:
+        print colorargs[0] + message + Color.END
+    else:
+        print message
+
 ############## Global vars ##############
 
 # 24 hours, in seconds
@@ -32,24 +53,40 @@ extend_key = False
 # Boolean for checking heroku
 running_on_heroku = False
 
+# Check to see if we're running on Heroku
+if os.environ.get('MEMCACHEDCLOUD_SERVERS', None):
+    import bmemcached
 
-# Color class, used for colors in terminal
-class Color:
-    PURPLE = '\033[95m'
-    CYAN = '\033[96m'
-    DARKCYAN = '\033[36m'
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    END = '\033[0m'
+    log('Running on heroku, using memcached', Color.BOLD)
+
+    # Authenticate Memcached
+    running_on_heroku = True
+    mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').
+                           split(','),
+                           os.environ.get('MEMCACHEDCLOUD_USERNAME'),
+                           os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
 
 
 # Junk method that I use for testing stuff periodically
 def test():
     log('Test', Color.PURPLE)
+    # testing memcached on heroku
+    if running_on_heroku:
+        test_list = [1, 2, 3, 4]
+        test_dict = {'test': 'blah', 'test2': test_list}
+
+        mc.set('testlist', test_list)
+        mc.set('testdict', test_dict)
+
+        test_list2 = mc.get('testlist')
+        test_dict2 = mc.get('testdict')
+
+        print test_list2
+        print test_dict2
+
+        assert test_list == test_list2
+        assert test_dict == test_dict2
+
 
 
 # Method for sending messages, adapted from here: http://goo.gl/oV5KtZ
@@ -155,14 +192,6 @@ def notify_mac():
                  "-sound", "default"])
         except OSError:
             print "If you have terminal-notifier, this would be a notification"
-
-
-# Log method. If there's a color argument, it'll stick that in first
-def log(message, *colorargs):
-    if len(colorargs) > 0:
-        print colorargs[0] + message + Color.END
-    else:
-        print message
 
 
 # Method for checking tag validity
@@ -301,7 +330,7 @@ def sub_group():
                 "per month" not in post_message:
             valid_post = False
             post_comment += "- Your post doesn't seem to mention pricing" + \
-                            " (no $ signs, <number>/month), \"per month\"\n"
+                            " (no $ signs, <number>/month), or \"per month\")\n"
             log('----$', Color.BLUE)
 
         # Check for tag validity
@@ -444,19 +473,12 @@ def sub_group():
 # Main method
 if __name__ == "__main__":
     args = sys.argv
-
-    # Check to see if we're running on Heroku
-    if os.environ.get('MEMCACHEDCLOUD_SERVERS', None):
-        import bmemcached
-
-        log('Running on heroku, using memcached', Color.BOLD)
-
-        # Authenticate Memcached
-        running_on_heroku = True
-        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').
-                               split(','),
-                               os.environ.get('MEMCACHEDCLOUD_USERNAME'),
-                               os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("-e", help="extend the access token on run")
+    # parser.add_argument("-i", help="initialize properties")
+    # parser.add_argument("-t", help="only run test method")
+    # parser.add_argument("-p", help="set some property values")
+    # args = parser.parse_args()
 
     # Arg parsing. I know, there's better ways to do this
     if len(args) > 1:
