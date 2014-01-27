@@ -469,6 +469,7 @@ if __name__ == "__main__":
         log('Running on heroku, using memcached', Color.BOLD)
 
         # Authenticate Memcached
+        global running_on_heroku
         running_on_heroku = True
         mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').
                                split(','),
