@@ -39,10 +39,10 @@ def log(message, *colorargs):
 time_limit = 86400
 
 # Pickle cache file caching warned posts
-db_file = "fb_subs_cache"
+warned_db = "fb_subs_cache"
 
 # Pickle cache file caching valid posts
-valid_db_file = "fb_subs_valid_cache"
+valid_db = "fb_subs_valid_cache"
 
 # Pickle cache file for properties
 prop_file = "login_prop"
@@ -57,6 +57,14 @@ running_on_heroku = False
 # Junk method that I use for testing stuff periodically
 def test():
     log('Test', Color.PURPLE)
+    log('Props cache', Color.GREEN)
+    print load_properties()
+
+    log('Warned cache', Color.GREEN)
+    print load_cache(warned_db)
+
+    log('Valid cache', Color.GREEN)
+    print load_cache(valid_db, {})
 
 
 # Method for sending messages, adapted from here: http://goo.gl/oV5KtZ
@@ -120,37 +128,58 @@ def init_props():
 
 # Method for saving (with pickle) your prop values
 def save_properties(data):
-    with open(prop_file, 'w+') as login_prop_file:
-        pickle.dump(data, login_prop_file)
+    if running_on_heroku:
+        mc.set('props', data)
+    else:
+        with open(prop_file, 'w+') as login_prop_file:
+            pickle.dump(data, login_prop_file)
 
 
 # Method for loading (with pickle) your prop values
 def load_properties():
-    if os.path.isfile(prop_file):
-        with open(prop_file, 'r+') as login_prop_file:
-            data = pickle.load(login_prop_file)
-            return data
+    if running_on_heroku:
+        obj = mc.get('props')
+        if not obj:
+            return {}
+        else:
+            return obj
     else:
-        sys.exit("No prop file found")
+        if os.path.isfile(prop_file):
+            with open(prop_file, 'r+') as login_prop_file:
+                data = pickle.load(login_prop_file)
+                return data
+        else:
+            sys.exit("No prop file found")
 
 
 # Method for loading a cache. Either returns cached values or original data
-def load_cache(filename, data):
-    if os.path.isfile(filename):
-        with open(filename, 'r+') as f:
-
-            # If the file isn't at its end or empty
-            if f.tell() != os.fstat(f.fileno()).st_size:
-                return pickle.load(f)
+def load_cache(cachename, data):
+    if running_on_heroku:
+        if running_on_heroku:
+            obj = mc.get(cachename)
+            if not obj:
+                return data
+            else:
+                return obj
     else:
-        log("--No cache file found, a new one will be created", Color.BLUE)
-        return data
+        if os.path.isfile(cachename):
+            with open(cachename, 'r+') as f:
+
+                # If the file isn't at its end or empty
+                if f.tell() != os.fstat(f.fileno()).st_size:
+                    return pickle.load(f)
+        else:
+            log("--No cache file found, a new one will be created", Color.BLUE)
+            return data
 
 
 # Method for saving to cache
-def save_cache(filename, data):
-    with open(filename, 'w+') as f:
-        pickle.dump(data, f)
+def save_cache(cachename, data):
+    if running_on_heroku:
+        mc.set(cachename, data)
+    else:
+        with open(cachename, 'w+') as f:
+            pickle.dump(data, f)
 
 
 # Nifty method for sending notifications on my mac when it's done
@@ -259,13 +288,13 @@ def sub_group():
     # Load the pickled cache of previously warned posts
     already_warned = dict()
     log("Loading warned cache", Color.BOLD)
-    already_warned = load_cache(db_file, already_warned)
+    already_warned = load_cache(warned_db, already_warned)
     log('--Loading cache size: ' + str(len(already_warned)), Color.BOLD)
 
     # Load the pickled cache of valid posts
     valid_posts = []
     log("Checking valid cache.", Color.BOLD)
-    valid_posts = load_cache(valid_db_file, valid_posts)
+    valid_posts = load_cache(valid_db, valid_posts)
     log('--Valid cache size: ' + str(len(valid_posts)), Color.BOLD)
 
     # Loop over retrieved posts
@@ -429,10 +458,10 @@ def sub_group():
 
     # Save the updated caches
     log('Saving warned cache', Color.BOLD)
-    save_cache(db_file, already_warned)
+    save_cache(warned_db, already_warned)
 
     log('Saving valid cache', Color.BOLD)
-    save_cache(valid_db_file, valid_posts)
+    save_cache(valid_db, valid_posts)
 
     save_properties(saved_props)
 
@@ -450,10 +479,7 @@ if __name__ == "__main__":
 
         # Authenticate Memcached
         running_on_heroku = True
-        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').
-                               split(','),
-                               os.environ.get('MEMCACHEDCLOUD_USERNAME'),
-                               os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
+        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').split(','), os.environ.get('MEMCACHEDCLOUD_USERNAME'), os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
 
     args = sys.argv
     # parser = argparse.ArgumentParser()
