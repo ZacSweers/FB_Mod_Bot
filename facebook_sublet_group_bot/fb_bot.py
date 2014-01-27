@@ -81,12 +81,12 @@ def test():
         test_list2 = mc.get('testlist')
         test_dict2 = mc.get('testdict')
 
-        print test_list2
-        print test_dict2
+        log(test_list2)
+        log(test_dict2)
 
+        log("Asserting", Color.RED)
         assert test_list == test_list2
         assert test_dict == test_dict2
-
 
 
 # Method for sending messages, adapted from here: http://goo.gl/oV5KtZ
