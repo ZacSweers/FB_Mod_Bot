@@ -58,26 +58,6 @@ running_on_heroku = False
 def test():
     log('Test', Color.PURPLE)
 
-    log("Running on heroku? - " + str(running_on_heroku), Color.GREEN)
-
-    # testing memcached on heroku
-    if running_on_heroku:
-        test_list = [1, 2, 3, 4]
-        test_dict = {'test': 'blah', 'test2': test_list}
-
-        mc.set('testlist', test_list)
-        mc.set('testdict', test_dict)
-
-        test_list2 = mc.get('testlist')
-        test_dict2 = mc.get('testdict')
-
-        log(test_list2)
-        log(test_dict2)
-
-        log("Asserting", Color.RED)
-        assert test_list == test_list2
-        assert test_dict == test_dict2
-
 
 # Method for sending messages, adapted from here: http://goo.gl/oV5KtZ
 def send_message(recipient, botid, message, api_key, access_token):
