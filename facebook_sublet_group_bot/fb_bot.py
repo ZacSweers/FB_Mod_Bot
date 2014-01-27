@@ -457,6 +457,14 @@ def sub_group():
 
     save_properties(saved_props)
 
+    # Testing for now on heroku. Going every 6 hours, and message admins to
+    # make sure nothing got screwed up
+    for i in admin_ids:
+        send_message(str(i), str(bot_id),
+                     "Just finished, please make sure I didn't screw up x_x",
+                     str(sublets_api_id),
+                     str(sublets_oauth_access_token))
+
     # Done
     notify_mac()
 
