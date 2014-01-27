@@ -70,6 +70,9 @@ if os.environ.get('MEMCACHEDCLOUD_SERVERS', None):
 # Junk method that I use for testing stuff periodically
 def test():
     log('Test', Color.PURPLE)
+
+    log("Running on heroku? - " + str(running_on_heroku), Color.GREEN)
+
     # testing memcached on heroku
     if running_on_heroku:
         test_list = [1, 2, 3, 4]
