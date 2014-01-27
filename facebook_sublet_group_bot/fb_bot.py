@@ -53,19 +53,6 @@ extend_key = False
 # Boolean for checking heroku
 running_on_heroku = False
 
-# Check to see if we're running on Heroku
-if os.environ.get('MEMCACHEDCLOUD_SERVERS', None):
-    import bmemcached
-
-    log('Running on heroku, using memcached', Color.BOLD)
-
-    # Authenticate Memcached
-    running_on_heroku = True
-    mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').
-                           split(','),
-                           os.environ.get('MEMCACHEDCLOUD_USERNAME'),
-                           os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
-
 
 # Junk method that I use for testing stuff periodically
 def test():
@@ -476,6 +463,21 @@ def sub_group():
 # Main method
 if __name__ == "__main__":
     args = sys.argv
+
+    # Check to see if we're running on Heroku
+    if os.environ.get('MEMCACHEDCLOUD_SERVERS', None):
+        import bmemcached
+
+        log('Running on heroku, using memcached', Color.BOLD)
+
+        # Authenticate Memcached
+        global running_on_heroku
+        running_on_heroku = True
+        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').
+                               split(','),
+                               os.environ.get('MEMCACHEDCLOUD_USERNAME'),
+                               os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
+
     # parser = argparse.ArgumentParser()
     # parser.add_argument("-e", help="extend the access token on run")
     # parser.add_argument("-i", help="initialize properties")
