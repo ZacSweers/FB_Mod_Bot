@@ -27,7 +27,7 @@ The group is a sublets/roommate finding group for students at my university, whe
 If any of those checks fail, it comments on the user notifying them of the problem(s) and specifies what it(they) are. Upon warning, it caches the post ID and time, giving them 24 hours to fix their post. On later runs, if a previously warned post is now valid, it removes the warning comment and the post ID from the cache. ~~I'd send a message thanking them too, but Facebook's API doesn't allow apps to send messages.~~ Yay XMPP
 
 ### TODO
-* Prepare for Heroku hosting
+* ~~Prepare for Heroku hosting~~ Done!
 * Improve documentation
 
 ### Caveats
