@@ -8,6 +8,7 @@ import facebook
 import time
 import subprocess
 import sys
+import re
 from fbxmpp import SendMsgBot
 
 __author__ = 'Henri Sweers'
@@ -187,17 +188,14 @@ def notify_mac():
 
 # Method for checking tag validity
 def check_tag_validity(message_text):
-    valid_tags = [
-        "[looking]", "[offering]", "[rooming]", "{looking}", "{offering}",
-        "{rooming}", "(looking)",
-        "(offering)", "(rooming)"]
+    p = re.compile(
+        "^(-|\*| )*([\(\[\{])((looking)|(rooming)|(offering))([\)\]\}])(\s|$)",
+        re.IGNORECASE)
 
-    message_text = message_text.lower()
-    for x in valid_tags:
-        if x in message_text:
-            return True
-
-    return False
+    if re.match(p, message_text):
+        return True
+    else:
+        return False
 
 
 # Method for extending access token
@@ -214,7 +212,6 @@ def extend_access_token(graph, now_time, saved_props, sublets_api_id,
 
 # Main runner method
 def sub_group():
-
     # Load the properties
     saved_props = load_properties()
 
@@ -299,7 +296,7 @@ def sub_group():
         # Unique ID of the person that posted it
         actor_id = post['actor_id']
 
-         # Ignore mods and certain posts
+        # Ignore mods and certain posts
         if post_id in ignored_post_ids or actor_id in ignore_source_ids or \
                 post_id in valid_posts:
             # log('\n--Ignored post: ' + post_id, Color.BLUE)
@@ -321,7 +318,7 @@ def sub_group():
                 "per month" not in post_message:
             valid_post = False
             post_comment += "- Your post doesn't seem to mention pricing" + \
-                            " (no $ signs, <number>/month), or \"per month\")\n"
+                " (no $ signs, <number>/month), or \"per month\")\n"
             log('----$', Color.BLUE)
 
         # Check for tag validity
@@ -331,6 +328,15 @@ def sub_group():
                 "- Your post appears to be missing a proper tag at the" + \
                 " front ([LOOKING], [ROOMING], or [OFFERING])\n"
             log('----Tag', Color.BLUE)
+
+            # Testing regex for now on heroku. Message admins to
+            # make sure nothing got screwed up
+            for i in admin_ids:
+                send_message(str(i), str(bot_id),
+                             "Just finished, please check I did this right: " +
+                             "http://www.facebook.com/" + post_id,
+                             str(sublets_api_id),
+                             str(sublets_oauth_access_token))
 
         # Check post length. Allow short ones if there's a craigslist link
         if len(post_message) < 200 and "craigslist" not in post_message.lower():
@@ -400,7 +406,6 @@ def sub_group():
 
                 # Comment if no previous comment
                 if not previously_commented:
-
                     # Comment to post for warning
                     post_comment += \
                         "\nPlease edit your post and fix the above within 24" +\
@@ -430,7 +435,6 @@ def sub_group():
                 comments = graph.fql(comments_query)
                 for comment in comments:
                     if comment['fromid'] == bot_id:
-
                         # Delete warning comment
                         graph.delete_object(comment['id'])
                         log('--Warning deleted')
@@ -456,14 +460,6 @@ def sub_group():
     save_cache(valid_db, valid_posts)
 
     save_properties(saved_props)
-
-    # Testing for now on heroku. Going every 6 hours, and message admins to
-    # make sure nothing got screwed up
-    for i in admin_ids:
-        send_message(str(i), str(bot_id),
-                     "Just finished, please make sure I didn't screw up x_x",
-                     str(sublets_api_id),
-                     str(sublets_oauth_access_token))
 
     # Done
     notify_mac()
