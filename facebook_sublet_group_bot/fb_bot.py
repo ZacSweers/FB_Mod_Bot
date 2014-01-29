@@ -289,6 +289,9 @@ def sub_group():
     # Loop over retrieved posts
     for post in group_posts:
 
+        # temporary
+        tagged = False
+
         # Important data received
         post_message = post['message']      # Content of the post
         post_id = post['post_id']           # Unique ID of the post
@@ -329,14 +332,7 @@ def sub_group():
                 " front ([LOOKING], [ROOMING], or [OFFERING])\n"
             log('----Tag', Color.BLUE)
 
-            # Testing regex for now on heroku. Message admins to
-            # make sure nothing got screwed up
-            for i in admin_ids:
-                send_message(str(i), str(bot_id),
-                             "Just finished, please check I did this right: " +
-                             "http://www.facebook.com/" + post_id,
-                             str(sublets_api_id),
-                             str(sublets_oauth_access_token))
+            tagged = True
 
         # Check post length. Allow short ones if there's a craigslist link
         if len(post_message) < 200 and "craigslist" not in post_message.lower():
@@ -418,6 +414,16 @@ def sub_group():
                     # Save
                     already_warned[post_id] = now_time
                     log('--WARNED', Color.RED)
+
+                    if tagged:
+                        # Testing regex for now on heroku. Message admins to
+                        # make sure nothing got screwed up
+                        for i in admin_ids:
+                            send_message(str(i), str(bot_id),
+                                         "Just finished, please check I did this right: " +
+                                         "http://www.facebook.com/" + post_id,
+                                         str(sublets_api_id),
+                                         str(sublets_oauth_access_token))
 
         # Valid post
         else:
