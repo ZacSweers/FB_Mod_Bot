@@ -34,6 +34,8 @@ class TestTagValidity(unittest.TestCase):
             self.assertTrue(check_tag_validity("*(" + tag + ")"))
             self.assertTrue(check_tag_validity("* (" + tag + ")"))
             self.assertTrue(check_tag_validity(" (" + tag + ")"))
+            self.assertTrue(check_tag_validity("(" + tag + "):"))
+            self.assertTrue(check_tag_validity("(" + tag + ") :"))
 
 
 if __name__ == '__main__':

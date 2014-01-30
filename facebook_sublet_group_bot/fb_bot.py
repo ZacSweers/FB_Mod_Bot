@@ -189,7 +189,7 @@ def notify_mac():
 # Method for checking tag validity
 def check_tag_validity(message_text):
     p = re.compile(
-        "^(-|\*| )*([\(\[\{])((looking)|(rooming)|(offering))([\)\]\}])(\s|$)",
+        "^(-|\*| )*([\(\[\{])((looking)|(rooming)|(offering))([\)\]\}])(:)?(\s|$)",
         re.IGNORECASE)
 
     if re.match(p, message_text):
