@@ -210,6 +210,33 @@ def extend_access_token(graph, now_time, saved_props, sublets_api_id,
     log("Token extended", Color.BOLD)
 
 
+# Method for retrieving user ID's of admins in group, ignoring bot ID
+def retrieve_admin_ids(group_id, bot_id, auth_token):
+
+    # Retrieve the uids via FQL query
+    graph = facebook.GraphAPI(auth_token)
+    admins_query = \
+        "SELECT uid FROM group_member WHERE gid=" + group_id + " AND" + \
+        " administrator AND NOT (uid = " + str(bot_id) + ")"
+    admins = graph.fql(query=admins_query)
+
+    # Parse out the uids from the response
+    admins_list = [admin['uid'] for admin in admins]
+
+    # Update the admin_ids in our properties
+    saved_props = load_properties()
+    saved_props['admin_ids'] = admins_list
+    save_properties(saved_props)
+
+    return admins_list
+
+
+# Extracted logic for messaging admins a message
+def message_admins(message, auth_token, app_id, bot_id, group_id):
+    for admin in retrieve_admin_ids(group_id, bot_id, auth_token):
+        send_message(str(admin), str(bot_id), message, app_id, auth_token)
+
+
 # Main runner method
 def sub_group():
     # Load the properties
@@ -239,7 +266,7 @@ def sub_group():
     # User ID of the bot
     bot_id = saved_props['bot_id']
 
-    # IDs of admins to notify about deleting a post
+    # IDs of admins (unused right now, might remove later)
     admin_ids = saved_props['admin_ids']
 
     # FQL query for the group
@@ -362,11 +389,9 @@ def sub_group():
 
                     # Otherwise message the admins the URL of the post to delete
                     else:
-                        for i in admin_ids:
-                            send_message(str(i), str(bot_id),
-                                         "Delete this post: " + url,
-                                         str(sublets_api_id),
-                                         str(sublets_oauth_access_token))
+                        message_admins("Delete this post: " + url,
+                                       sublets_oauth_access_token,
+                                       sublets_api_id, bot_id, group_id)
 
                 # Invalid but they still have time
                 else:
@@ -418,12 +443,11 @@ def sub_group():
                     if tagged:
                         # Testing regex for now on heroku. Message admins to
                         # make sure nothing got screwed up
-                        for i in admin_ids:
-                            send_message(str(i), str(bot_id),
-                                         "Just finished, please check I did this right: " +
-                                         "http://www.facebook.com/" + post_id,
-                                         str(sublets_api_id),
-                                         str(sublets_oauth_access_token))
+                        message_admins(
+                            "Just finished, please check I did this right: " +
+                            "http://www.facebook.com/" + post_id,
+                            sublets_oauth_access_token,
+                            sublets_api_id, bot_id, group_id)
 
         # Valid post
         else:
