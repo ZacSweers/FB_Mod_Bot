@@ -276,6 +276,10 @@ def sub_group():
     # Get current time
     now_time = time.time()
 
+    # For logging purposes
+    log("CURRENT CST TIMESTAMP: " + datetime.datetime.fromtimestamp(
+        now_time - 21600).strftime('%Y-%m-%d %H:%M:%S'), Color.UNDERLINE)
+
     # Make sure the access token is still valid
     if access_token_expiration < now_time:
         sys.exit("API Token is expired")
@@ -316,9 +320,6 @@ def sub_group():
     # Loop over retrieved posts
     for post in group_posts:
 
-        # temporary
-        tagged = False
-
         # Important data received
         post_message = post['message']      # Content of the post
         post_id = post['post_id']           # Unique ID of the post
@@ -358,8 +359,6 @@ def sub_group():
                 "- Your post appears to be missing a proper tag at the" + \
                 " front ([LOOKING], [ROOMING], or [OFFERING])\n"
             log('----Tag', Color.BLUE)
-
-            tagged = True
 
         # Check post length. Allow short ones if there's a craigslist link
         if len(post_message) < 200 and "craigslist" not in post_message.lower():
@@ -439,15 +438,6 @@ def sub_group():
                     # Save
                     already_warned[post_id] = now_time
                     log('--WARNED', Color.RED)
-
-                    if tagged:
-                        # Testing regex for now on heroku. Message admins to
-                        # make sure nothing got screwed up
-                        message_admins(
-                            "Just finished, please check I did this right: " +
-                            "http://www.facebook.com/" + post_id,
-                            sublets_oauth_access_token,
-                            sublets_api_id, bot_id, group_id)
 
         # Valid post
         else:
