@@ -198,6 +198,18 @@ def check_tag_validity(message_text):
         return False
 
 
+# Method for checking if pricing reference is there
+def check_price_validity(message_text):
+    p = re.compile(
+        "(\$)|((\d)+( )?((per)|(/)|(a))( )?(/)?((month)|(mon))(\s)?)",
+        re.IGNORECASE)
+
+    if re.search(p, message_text) is not None:
+        return True
+    else:
+        return False
+
+
 # Method for extending access token
 def extend_access_token(graph, now_time, saved_props, sublets_api_id,
                         sublets_secret_key):
@@ -327,6 +339,9 @@ def sub_group():
         # Unique ID of the person that posted it
         actor_id = post['actor_id']
 
+        # temporary, testing price mentioning validity
+        price_failed = False
+
         # Ignore mods and certain posts
         if post_id in ignored_post_ids or actor_id in ignore_source_ids or \
                 post_id in valid_posts:
@@ -345,12 +360,12 @@ def sub_group():
             str(post_id) + "\n--ACTOR ID: " + str(actor_id))
 
         # Check for pricing
-        if "$" not in post_message and "/month" not in post_message and \
-                "per month" not in post_message:
+        if not check_price_validity(post_message):
             valid_post = False
             post_comment += "- Your post doesn't seem to mention pricing" + \
                 " (no $ signs, <number>/month), or \"per month\")\n"
             log('----$', Color.BLUE)
+            price_failed = True
 
         # Check for tag validity
         if not check_tag_validity(post_message):
@@ -438,6 +453,13 @@ def sub_group():
                     # Save
                     already_warned[post_id] = now_time
                     log('--WARNED', Color.RED)
+
+                    # Temporary, testing the new price regex
+                    if price_failed:
+                        message_admins("Please check that I warned about the" +
+                                       " price correctly",
+                                       sublets_oauth_access_token,
+                                       sublets_api_id, bot_id, group_id)
 
         # Valid post
         else:
