@@ -201,7 +201,7 @@ def check_tag_validity(message_text):
 # Method for checking if pricing reference is there
 def check_price_validity(message_text):
     p = re.compile(
-        "(\$)|((\d)+( )?((per)|(/)|(a))( )?(/)?((month)|(mon))(\s)?)",
+        "(\$)|((\d)+( )?((per)|(/)|(a))( )?(/)?((month)|(mon)|(mo))(\s)?)",
         re.IGNORECASE)
 
     if re.search(p, message_text) is not None:
