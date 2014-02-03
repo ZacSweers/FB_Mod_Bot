@@ -457,7 +457,8 @@ def sub_group():
                     # Temporary, testing the new price regex
                     if price_failed:
                         message_admins("Please check that I warned about the" +
-                                       " price correctly",
+                                       " price correctly:" +
+                                       " http://www.facebook.com/" + post_id,
                                        sublets_oauth_access_token,
                                        sublets_api_id, bot_id, group_id)
 
