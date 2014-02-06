@@ -339,9 +339,6 @@ def sub_group():
         # Unique ID of the person that posted it
         actor_id = post['actor_id']
 
-        # temporary, testing price mentioning validity
-        price_failed = False
-
         # Ignore mods and certain posts
         if post_id in ignored_post_ids or actor_id in ignore_source_ids or \
                 post_id in valid_posts:
@@ -453,14 +450,6 @@ def sub_group():
                     # Save
                     already_warned[post_id] = now_time
                     log('--WARNED', Color.RED)
-
-                    # Temporary, testing the new price regex
-                    if price_failed:
-                        message_admins("Please check that I warned about the" +
-                                       " price correctly:" +
-                                       " http://www.facebook.com/" + post_id,
-                                       sublets_oauth_access_token,
-                                       sublets_api_id, bot_id, group_id)
 
         # Valid post
         else:
