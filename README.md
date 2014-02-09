@@ -5,9 +5,9 @@ Facebook Mod Bot
   <img src="http://i.imgur.com/xqpBTlg.png" alt="Sublet Bot" height="250" width="250"/>
 </p>
 
-This is a facebook bot that I wrote to moderate a group I admin, essentially keeping some order and upholding some requirements per the group rules. The main purpose is to crack down on vague/uninformative posts.
-
 **[Changelog](https://github.com/pandanomic/FB_Mod_Bot/blob/master/CHANGELOG.md)**
+
+This is a facebook bot that I wrote to moderate a group I admin, essentially keeping some order and upholding some requirements per the group rules. The main purpose is to crack down on vague/uninformative posts.
 
 Anyone is welcome to use this code and/or repurpose it for their own use. All I ask is that you give me credit somewhere :)
 
