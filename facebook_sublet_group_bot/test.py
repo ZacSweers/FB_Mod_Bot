@@ -5,7 +5,7 @@ import unittest
 
 class TestTagValidity(unittest.TestCase):
     def setUp(self):
-        self.test_tags = ["Looking", "Rooming", "Offering"]
+        self.test_tags = ["Looking", "Rooming", "Offering", "Parking"]
         self.junk = """here's some other text because yeah more text to
             to illustrate lots more text here in the rest of the post"""
 
@@ -36,6 +36,30 @@ class TestTagValidity(unittest.TestCase):
             self.assertTrue(check_tag_validity(" (" + tag + ")"))
             self.assertTrue(check_tag_validity("(" + tag + "):"))
             self.assertTrue(check_tag_validity("(" + tag + ") :"))
+
+    def test_parking(self):
+        from fb_bot import check_for_parking_tag
+        tag = "parking"
+        self.assertTrue(check_for_parking_tag("(" + tag + ")"))
+        self.assertTrue(check_for_parking_tag("{" + tag + "}"))
+        self.assertTrue(check_for_parking_tag("[" + tag + "]"))
+        self.assertTrue(check_for_parking_tag("(" + tag + "]"))
+        self.assertTrue(check_for_parking_tag("{" + tag + "]"))
+        self.assertTrue(check_for_parking_tag("(" + tag + "}"))
+        self.assertTrue(check_for_parking_tag("{" + tag + ")"))
+        self.assertFalse(check_for_parking_tag(tag + ")"))
+        self.assertFalse(check_for_parking_tag("{" + tag))
+        self.assertFalse(check_for_parking_tag(tag))
+        self.assertTrue(check_for_parking_tag("(" + tag + ") sometjunk"))
+        self.assertFalse(check_for_parking_tag("{" + tag + "}" + self.junk))
+        self.assertFalse(check_for_parking_tag("dsflkj{" + tag.lower() + ")"))
+        self.assertFalse(check_for_parking_tag("dsflkj {" + tag.lower() + ")"))
+        self.assertTrue(check_for_parking_tag("-(" + tag + ")"))
+        self.assertTrue(check_for_parking_tag("*(" + tag + ")"))
+        self.assertTrue(check_for_parking_tag("* (" + tag + ")"))
+        self.assertTrue(check_for_parking_tag(" (" + tag + ")"))
+        self.assertTrue(check_for_parking_tag("(" + tag + "):"))
+        self.assertTrue(check_for_parking_tag("(" + tag + ") :"))
 
 
 class TestPriceValidity(unittest.TestCase):

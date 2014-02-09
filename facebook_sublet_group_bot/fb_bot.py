@@ -189,7 +189,7 @@ def notify_mac():
 # Method for checking tag validity
 def check_tag_validity(message_text):
     p = re.compile(
-        "^(-|\*| )*([\(\[\{])((looking)|(rooming)|(offering))([\)\]\}])(:)?(\s|$)",
+        "^(-|\*| )*([\(\[\{])((looking)|(rooming)|(offering)|(parking))([\)\]\}])(:)?(\s|$)",
         re.IGNORECASE)
 
     if re.match(p, message_text):
@@ -205,6 +205,18 @@ def check_price_validity(message_text):
         re.IGNORECASE)
 
     if re.search(p, message_text) is not None:
+        return True
+    else:
+        return False
+
+
+# Checking if there's a parking tag
+def check_for_parking_tag(message_text):
+    p = re.compile(
+        "^(-|\*| )*([\(\[\{])(parking)([\)\]\}])(:)?(\s|$)",
+        re.IGNORECASE)
+
+    if re.search(p, message_text):
         return True
     else:
         return False
@@ -362,7 +374,6 @@ def sub_group():
             post_comment += "- Your post doesn't seem to mention pricing" + \
                 " (no $ signs, <number>/month), or \"per month\")\n"
             log('----$', Color.BLUE)
-            price_failed = True
 
         # Check for tag validity
         if not check_tag_validity(post_message):
@@ -372,8 +383,11 @@ def sub_group():
                 " front ([LOOKING], [ROOMING], or [OFFERING])\n"
             log('----Tag', Color.BLUE)
 
-        # Check post length. Allow short ones if there's a craigslist link
-        if len(post_message) < 200 and "craigslist" not in post_message.lower():
+        # Check post length.
+        # Allow short ones if there's a craigslist link or parking
+        if len(post_message) < 200 and \
+                "craigslist" not in post_message.lower() \
+                and not check_for_parking_tag(post_message):
             valid_post = False
             post_comment += \
                 "- Your post is a little short (<200 chars). Please give" + \
