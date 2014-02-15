@@ -13,7 +13,7 @@ def delete_post(usr, pwd, post_id):
         # or you can use Chrome(executable_path="/usr/bin/chromedriver")
         print "Opening facebook..."
         driver.get("http://www.facebook.org")
-        time.sleep(1)
+        time.sleep(2)
         assert "Facebook" in driver.title
 
         print "Logging in..."
@@ -25,12 +25,12 @@ def delete_post(usr, pwd, post_id):
 
         print "Retrieving post..."
         driver.get(post_to_delete)
-        time.sleep(1)
+        time.sleep(2)
 
         print "Expanding arrow options..."
         elem = driver.find_element_by_xpath("//a[contains(@class,'_5pbj _p')]")
         elem.click()
-        time.sleep(1)
+        time.sleep(2)
 
         print "Finding delete option..."
         elem = driver.find_element_by_xpath("//div[contains(@class,'_54ng')]")
@@ -38,7 +38,7 @@ def delete_post(usr, pwd, post_id):
 
         print "Clicking delete..."
         links[2].click()
-        time.sleep(1)
+        time.sleep(2)
 
         print "Finding delete confirmation 'enter'..."
         elem = driver.find_element_by_css_selector("button._42fu:nth-child(1)")
