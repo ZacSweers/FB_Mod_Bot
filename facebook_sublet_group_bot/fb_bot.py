@@ -10,6 +10,7 @@ import subprocess
 import sys
 import re
 from fbxmpp import SendMsgBot
+from delete_post import delete_post
 
 __author__ = 'Henri Sweers'
 
@@ -414,9 +415,18 @@ def sub_group():
 
                     # Otherwise message the admins the URL of the post to delete
                     else:
-                        message_admins("Delete this post: " + url,
-                                       sublets_oauth_access_token,
-                                       sublets_api_id, bot_id, group_id)
+                        try:
+                            delete_post(url)
+                            message_admins(
+                                "Please make sure this is gone: " + url,
+                                sublets_oauth_access_token,
+                                sublets_api_id, bot_id, group_id)
+                        except Exception as e:
+                            message_admins(
+                                "Something went wrong, check heroku logs",
+                                sublets_oauth_access_token,
+                                sublets_api_id, bot_id, group_id)
+                            log(e.message, Color.RED)
 
                 # Invalid but they still have time
                 else:
