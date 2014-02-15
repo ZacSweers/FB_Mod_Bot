@@ -7,7 +7,7 @@ import time
 def delete_post(usr, pwd, post_id):
     print "STARTING DELETE"
     post_to_delete = "http://www.facebook.com/" + post_id
-    sleep_time = 5
+    sleep_time = 4
 
     with contextlib.closing(webdriver.PhantomJS()) as driver:
         # or you can use Firefox()
