@@ -423,7 +423,7 @@ def sub_group():
                                 sublets_api_id, bot_id, group_id)
                         except Exception as e:
                             message_admins(
-                                "Something went wrong, check heroku logs",
+                                "Delete this post" + url,
                                 sublets_oauth_access_token,
                                 sublets_api_id, bot_id, group_id)
                             log(e.message, Color.RED)
