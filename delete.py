@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 def delete_post(usr, pwd, post):
     print "STARTING DELETE"
 
-    with contextlib.closing(webdriver.Firefox()) as driver:
+    with contextlib.closing(webdriver.PhantomJS()) as driver:
         # or you can use Firefox()
         # or you can use Chrome(executable_path="/usr/bin/chromedriver")
         print "--Opening facebook..."
