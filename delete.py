@@ -1,14 +1,14 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.wait import WebDriverWait
 import contextlib
 import time
 
 
 def delete_post(usr, pwd, post):
     print "STARTING DELETE"
+    timeout_counter = 0
 
-    with contextlib.closing(webdriver.Firefox()) as driver:
+    with contextlib.closing(webdriver.PhantomJS()) as driver:
         # or you can use Firefox()
         # or you can use Chrome(executable_path="/usr/bin/chromedriver")
         print "--Opening facebook..."
