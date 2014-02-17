@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding=utf-8
 
 import os
 import cPickle as pickle
@@ -13,6 +14,7 @@ from fbxmpp import SendMsgBot
 from delete_post import delete_post
 
 __author__ = 'Henri Sweers'
+
 
 # Color class, used for colors in terminal
 class Color:
@@ -417,10 +419,23 @@ def sub_group():
                     else:
                         try:
                             delete_post(url)
-                            message_admins(
-                                "Please make sure this is gone: " + url,
-                                sublets_oauth_access_token,
-                                sublets_api_id, bot_id, group_id)
+
+                            log("--Confirming deletion...")
+                            try:
+                                # Give it a sec to propagate
+                                time.sleep(2)
+                                graph.get_object(id=post_id)
+
+                                # If it got here something went wrong
+                                message_admins(
+                                    "Please make sure this is gone: " + url,
+                                    sublets_oauth_access_token,
+                                    sublets_api_id, bot_id, group_id)
+                            except:
+                                log("Deletion confirmed ✓", Color.GREEN)
+                                del already_warned[post_id]
+
+                        # Something went wrong, have the admins delete it
                         except Exception as e:
                             message_admins(
                                 "Delete this post: " + url,

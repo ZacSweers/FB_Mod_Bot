@@ -1,7 +1,8 @@
+# coding=utf-8
 import os
 import pickle
 import sys
-import webbrowser
+import time
 from delete import delete_post
 import facebook
 
@@ -33,8 +34,8 @@ def test():
     # Access token
     sublets_oauth_access_token = saved_props['sublets_oauth_access_token']
 
-    usr = saved_props['fb_user']
-    pwd = saved_props['fb_pwd']
+    usr = saved_props['FB_USER']
+    pwd = saved_props['FB_PWD']
 
     # ID of the FB group
     group_id = saved_props['group_id']
@@ -44,12 +45,21 @@ def test():
     obj = graph.put_object(group_id, "feed", message="test")
     postid = obj['id']
     url = "http://www.facebook.com/" + postid
-    if not running_on_heroku:
-        webbrowser.open_new_tab(url)
-    else:
-        print url
 
-    delete_post(usr, pwd, url)
+    try:
+        delete_post(usr, pwd, url, test)
+    except Exception as e:
+        print 'ERROR: ' + e.message
+        print type(e)
+        graph.delete_object(postid)
+        print "Deleted manually"
+
+    print "Confirming deletion..."
+    time.sleep(2)
+    try:
+        print graph.get_object(id=postid)
+    except:
+        print "Deletion confirmed ✓"
 
 
 if __name__ == "__main__":
