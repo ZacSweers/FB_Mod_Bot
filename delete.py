@@ -52,7 +52,8 @@ def delete_post(usr, pwd, post):
         elem = driver.find_elements_by_xpath("//a[contains(@class,'_5pbj _p')]")
         while len(elem) == 0:
             print '----Waiting'
-            time.sleep(1)
+            print elem
+            time.sleep(2)
             timeout_counter += 1
             if timeout_counter == 5:
                 raise Exception("TimedOut")
@@ -66,7 +67,8 @@ def delete_post(usr, pwd, post):
         elem = driver.find_elements_by_xpath("//div[contains(@class,'_54ng')]")
         while len(elem) == 0:
             print '----Waiting'
-            time.sleep(1)
+            print elem
+            time.sleep(2)
             timeout_counter += 1
             if timeout_counter == 5:
                 raise Exception("TimedOut")
@@ -78,7 +80,8 @@ def delete_post(usr, pwd, post):
         links = elem.find_elements_by_xpath('.//a')
         while len(links) == 0:
             print '----Waiting'
-            time.sleep(1)
+            print elem
+            time.sleep(2)
             timeout_counter += 1
             if timeout_counter == 5:
                 raise Exception("TimedOut")
@@ -92,14 +95,14 @@ def delete_post(usr, pwd, post):
         elem = driver.find_elements_by_css_selector("button._42fu:nth-child(1)")
         while len(elem) == 0:
             print '----Waiting'
-            time.sleep(1)
+            print elem
+            time.sleep(2)
             timeout_counter += 1
             if timeout_counter == 5:
                 raise Exception("TimedOut")
             elem = driver.find_elements_by_css_selector(
                 "button._42fu:nth-child(1)")
 
-        timeout_counter = 0
         print "--Deleting..."
         elem[0].click()
 
