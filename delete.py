@@ -30,14 +30,11 @@ def delete_post(usr, pwd, post, *test):
         elem.send_keys(pwd)
         elem.send_keys(Keys.RETURN)
 
+        # Wait for login to finish
         time.sleep(2)
-
-        print driver.page_source
 
         print "--Retrieving post..."
         driver.get(post)
-
-        print driver.page_source
 
         print "--Expanding arrow options..."
         elem = wait.until(EC.presence_of_element_located(
