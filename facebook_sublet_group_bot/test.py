@@ -1,9 +1,36 @@
+import os
+import pickle
+import sys
+
 __author__ = 'pandanomic'
 
 import unittest
 
 
+def load_properties():
+    prop_file = "login_prop"
+    if os.environ.get('MEMCACHEDCLOUD_SERVERS', None):
+        import bmemcached
+        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').
+                               split(','),
+                               os.environ.get('MEMCACHEDCLOUD_USERNAME'),
+                               os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
+        obj = mc.get('props')
+        if not obj:
+            return {}
+        else:
+            return obj
+    else:
+        if os.path.isfile(prop_file):
+            with open(prop_file, 'r+') as login_prop_file:
+                data = pickle.load(login_prop_file)
+                return data
+        else:
+            sys.exit("No prop file found")
+
+
 class TestTagValidity(unittest.TestCase):
+
     def setUp(self):
         self.test_tags = ["Looking", "Rooming", "Offering", "Parking"]
         self.junk = """here's some other text because yeah more text to
@@ -164,5 +191,26 @@ class TestPriceValidity(unittest.TestCase):
         self.assertTrue(check_price_validity("Blah blah 300amo"))
 
 
+class TestDeletion(unittest.TestCase):
+
+    def test_regular(self):
+        import delete_test
+
+        # Suppress stdout printing
+        _stdout = sys.stdout
+        null = open(os.devnull, 'wb')
+        sys.stdout = null
+
+        # Run test
+        self.assertTrue(delete_test.test())
+
+        # Restore stdout printing
+        sys.stdout = _stdout
+
+
 if __name__ == '__main__':
+    print ""
+    print "-----------------"
+    print "| Running tests |"
+    print "-----------------"
     unittest.main()

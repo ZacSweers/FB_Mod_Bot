@@ -3,16 +3,18 @@ import os
 import pickle
 import sys
 import time
-from delete import delete_post
+from delete_post import delete_post
 import facebook
 
 
-prop_file = "login_prop"
-running_on_heroku = False
-
-
 def load_properties():
-    if running_on_heroku:
+    prop_file = "login_prop"
+    if os.environ.get('MEMCACHEDCLOUD_SERVERS', None):
+        import bmemcached
+        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').
+                               split(','),
+                               os.environ.get('MEMCACHEDCLOUD_USERNAME'),
+                               os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
         obj = mc.get('props')
         if not obj:
             return {}
@@ -53,25 +55,17 @@ def test():
         print type(e)
         graph.delete_object(postid)
         print "Deleted manually"
+        return False
 
     print "Confirming deletion..."
     time.sleep(2)
     try:
         print graph.get_object(id=postid)
+        return False
     except:
         print "Deletion confirmed ✓"
+        return True
 
 
 if __name__ == "__main__":
-    # Check to see if we're running on Heroku
-    if os.environ.get('MEMCACHEDCLOUD_SERVERS', None):
-        import bmemcached
-
-        # Authenticate Memcached
-        running_on_heroku = True
-        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').
-                               split(','),
-                               os.environ.get('MEMCACHEDCLOUD_USERNAME'),
-                               os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
-
     test()

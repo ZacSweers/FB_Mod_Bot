@@ -418,7 +418,9 @@ def sub_group():
                     # Otherwise message the admins the URL of the post to delete
                     else:
                         try:
-                            delete_post(url)
+                            delete_post(saved_props['FB_USER'],
+                                        saved_props['FB_PWD'],
+                                        url)
 
                             log("--Confirming deletion...")
                             try:
