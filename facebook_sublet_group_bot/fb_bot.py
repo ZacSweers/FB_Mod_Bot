@@ -87,22 +87,40 @@ def send_message(recipient, botid, message, api_key, access_token):
 def set_new_props():
     saved_dict = load_properties()
 
+    ###############################################################
     #### Uncomment lines below as needed to manually set stuff ####
+    ###############################################################
 
-    #### These are strings
+    ###########################
+    #### These are strings ####
+    ###########################
+
     # saved_dict['sublets_oauth_access_token'] = "put-auth-token-here"
     # saved_dict['sublets_api_id'] = "put-app-id-here"
     # saved_dict['sublets_secret_key'] = "put-secret-key-here"
     # saved_dict['access_token_expiration'] = "put-access-token-expiration-here"
     # saved_dict['group_id'] = "put-group-id-here"
 
-    #### These are ints
+    ################################################################
+    #### If you want post deletion, must be done outside of API ####
+    ################################################################
+
+    # saved_dict['FB_USER'] = "put-facebook-username-here"
+    # saved_dict['FB_PWD'] = "put-facebook-password-here"
+
+
+    ########################
+    #### These are ints ####
+    ########################
+
     # saved_dict['bot_id'] = put-bot-id-here
     # saved_dict['ignored_post_ids'].append(<id_num>)
     # saved_dict['ignore_source_ids'].append(<id_num>)
     # saved_dict['admin_ids'].append(<id_num>)
 
+    #################################################################
     #### You can do other stuff too, the above are just examples ####
+    #################################################################
 
     save_properties(saved_dict)
 
@@ -112,7 +130,10 @@ def init_props():
     test_dict = {'sublets_oauth_access_token': "put-auth-token-here",
                  'sublets_api_id': "put-app-id-here",
                  'sublets_secret_key': "put-secret-key-here",
+                 'access_token_expiration': "put-access-token-expiration-here",
                  'group_id': 'put-group-id-here',
+                 'FB_USER': "put-facebook-username-here",
+                 'FB_PWD': "put-facebook-password-here",
                  'bot_id': -1,
                  'ignored_post_ids': [],
                  'ignore_source_ids': [],
@@ -425,7 +446,7 @@ def sub_group():
                             log("--Confirming deletion...")
                             try:
                                 # Give it a sec to propagate
-                                time.sleep(2)
+                                time.sleep(3)
                                 graph.get_object(id=post_id)
 
                                 # If it got here something went wrong

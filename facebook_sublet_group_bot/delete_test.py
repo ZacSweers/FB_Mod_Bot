@@ -6,6 +6,8 @@ import time
 from delete_post import delete_post
 import facebook
 
+__author__ = 'Henri Sweers'
+
 
 def load_properties():
     prop_file = "login_prop"

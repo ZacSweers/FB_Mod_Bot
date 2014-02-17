@@ -1,8 +1,9 @@
 import os
 import pickle
 import sys
+import subprocess
 
-__author__ = 'pandanomic'
+__author__ = 'Henri Sweers'
 
 import unittest
 
@@ -27,6 +28,17 @@ def load_properties():
                 return data
         else:
             sys.exit("No prop file found")
+
+
+# Nifty method for sending notifications on my mac when it's done
+def notify_mac():
+    if sys.platform == "darwin":
+        try:
+            subprocess.call(
+                ["terminal-notifier", "-message", "Tests done", "-title",
+                 "FB_Bot", "-sound", "default"])
+        except OSError:
+            print "If you have terminal-notifier, this would be a notification"
 
 
 class TestTagValidity(unittest.TestCase):
@@ -208,9 +220,14 @@ class TestDeletion(unittest.TestCase):
         sys.stdout = _stdout
 
 
-if __name__ == '__main__':
+def main():
     print ""
     print "-----------------"
     print "| Running tests |"
     print "-----------------"
     unittest.main()
+    notify_mac()
+
+
+if __name__ == '__main__':
+    main()

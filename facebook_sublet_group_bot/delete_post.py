@@ -6,6 +6,8 @@ import time
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 
+__author__ = 'Henri Sweers'
+
 
 # Deletes a post using selenium and phantomJS
 def delete_post(usr, pwd, post, *test):
