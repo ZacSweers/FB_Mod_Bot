@@ -423,7 +423,7 @@ def sub_group():
                                 sublets_api_id, bot_id, group_id)
                         except Exception as e:
                             message_admins(
-                                "Delete this post" + url,
+                                "Delete this post: " + url,
                                 sublets_oauth_access_token,
                                 sublets_api_id, bot_id, group_id)
                             log(e.message, Color.RED)
