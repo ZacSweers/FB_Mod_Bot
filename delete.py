@@ -17,7 +17,7 @@ def delete_post(usr, pwd, post, *test):
         # or you can use Firefox()
         # or you can use Chrome(executable_path="/usr/bin/chromedriver")
 
-        wait = WebDriverWait(driver, 10)
+        wait = WebDriverWait(driver, 15)
 
         print "--Opening facebook..."
         driver.get("http://www.facebook.com")
@@ -34,10 +34,10 @@ def delete_post(usr, pwd, post, *test):
 
         print "--Expanding arrow options..."
         elem = wait.until(EC.presence_of_element_located(
-            (By.XPATH, "//a[contains(@class,'_5pbj _p')]")))
+            (By.XPATH, "//a[contains(@aria-label,'Post options')]")))
         elem.click()
 
-        print "--Expanding options..."
+        print "--Waiting for options to load..."
         elem = wait.until(EC.presence_of_element_located(
             (By.XPATH, "//ul[contains(@class,'_54nf')]")))
 
