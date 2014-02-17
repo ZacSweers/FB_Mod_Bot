@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 import contextlib
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import time
 
 
 def delete_post(usr, pwd, post, *test):
@@ -29,8 +30,14 @@ def delete_post(usr, pwd, post, *test):
         elem.send_keys(pwd)
         elem.send_keys(Keys.RETURN)
 
+        time.sleep(2)
+
+        print driver.page_source
+
         print "--Retrieving post..."
         driver.get(post)
+
+        print driver.page_source
 
         print "--Expanding arrow options..."
         elem = wait.until(EC.presence_of_element_located(
