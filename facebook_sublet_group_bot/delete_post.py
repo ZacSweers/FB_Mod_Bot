@@ -13,101 +13,53 @@ def delete_post(post):
     print "--STARTING DELETE"
     usr = os.environ.get('FB_USER')
     pwd = os.environ.get('FB_PWD')
-    timeout_counter = 0
+    sleep_time = 2
 
     with contextlib.closing(webdriver.PhantomJS()) as driver:
         # or you can use Firefox()
         # or you can use Chrome(executable_path="/usr/bin/chromedriver")
         print "--Opening facebook..."
         driver.get("http://www.facebook.org")
+        time.sleep(sleep_time)
         assert "Facebook" in driver.title
 
         print "--Logging in..."
-        while True:
-            try:
-                elem = driver.find_element_by_id("email")
-                break
-            except:
-                print "----Waiting"
-                time.sleep(1)
-                timeout_counter += 1
-                if timeout_counter == 5:
-                    raise Exception("TimedOut")
-
-        timeout_counter = 0
+        elem = driver.find_element_by_id("email")
+        time.sleep(sleep_time)
         elem.send_keys(usr)
-
-        while True:
-            try:
-                elem = driver.find_element_by_id("pass")
-                break
-            except:
-                print "----Waiting"
-                time.sleep(1)
-                timeout_counter += 1
-                if timeout_counter == 5:
-                    raise Exception("TimedOut")
-
-        timeout_counter = 0
+        time.sleep(sleep_time)
+        elem = driver.find_element_by_id("pass")
+        time.sleep(sleep_time)
         elem.send_keys(pwd)
+        time.sleep(sleep_time)
         elem.send_keys(Keys.RETURN)
+        time.sleep(sleep_time)
 
         print "--Retrieving post..."
         driver.get(post)
+        time.sleep(sleep_time)
 
         print "--Expanding arrow options..."
-        elem = driver.find_elements_by_xpath("//a[contains(@class,'_5pbj _p')]")
-        while len(elem) == 0:
-            print '----Waiting'
-            time.sleep(1)
-            timeout_counter += 1
-            if timeout_counter == 5:
-                raise Exception("TimedOut")
-            elem = driver.find_elements_by_xpath(
-                "//a[contains(@class,'_5pbj _p')]")
-
-        timeout_counter = 0
-        elem[0].click()
+        elem = driver.find_element_by_xpath("//a[contains(@class,'_5pbj _p')]")
+        time.sleep(sleep_time)
+        elem.click()
+        time.sleep(sleep_time)
 
         print "--Finding delete option..."
-        elem = driver.find_elements_by_xpath("//div[contains(@class,'_54ng')]")
-        while len(elem) == 0:
-            print '----Waiting'
-            time.sleep(1)
-            timeout_counter += 1
-            if timeout_counter == 5:
-                raise Exception("TimedOut")
-            elem = driver.find_elements_by_xpath(
-                "//div[contains(@class,'_54ng')]")
-
-        timeout_counter = 0
-        elem = elem[0]
+        elem = driver.find_element_by_xpath("//div[contains(@class,'_54ng')]")
+        time.sleep(sleep_time)
         links = elem.find_elements_by_xpath('.//a')
-        while len(links) == 0:
-            print '----Waiting'
-            time.sleep(1)
-            timeout_counter += 1
-            if timeout_counter == 5:
-                raise Exception("TimedOut")
-            links = elem.find_elements_by_xpath('.//a')
+        time.sleep(sleep_time)
 
         print "--Clicking delete..."
-        timeout_counter = 0
         links[2].click()
+        time.sleep(sleep_time)
 
         print "--Finding delete confirmation 'enter'..."
-        elem = driver.find_elements_by_css_selector("button._42fu:nth-child(1)")
-        while len(elem) == 0:
-            print '----Waiting'
-            time.sleep(1)
-            timeout_counter += 1
-            if timeout_counter == 5:
-                raise Exception("TimedOut")
-            elem = driver.find_elements_by_css_selector(
-                "button._42fu:nth-child(1)")
+        elem = driver.find_element_by_css_selector("button._42fu:nth-child(1)")
+        time.sleep(sleep_time)
 
-        timeout_counter = 0
         print "--Deleting..."
-        elem[0].click()
+        elem.click()
 
-        print "--Deleted"
+        print "Deleted"
