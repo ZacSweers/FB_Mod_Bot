@@ -604,6 +604,7 @@ if __name__ == "__main__":
     except Exception:
         if running_on_heroku:
             # Use raven to capture exceptions and email
-            # Set your raven stuff by installing
+            # Set your raven stuff by installing it in heroku and get the python
+            #   setup info from the Python section
             client = Client(os.environ.get('RAVEN'))
             client.captureException()
