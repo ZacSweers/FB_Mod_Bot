@@ -2,3 +2,4 @@ facebook-sdk==0.4.0
 sleekxmpp==1.1.11
 python-binary-memcached==0.21
 selenium==2.39.0
+raven==4.0.4
