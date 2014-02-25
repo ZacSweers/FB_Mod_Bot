@@ -465,7 +465,7 @@ def sub_group():
                                 "Delete this post: " + url,
                                 sublets_oauth_access_token,
                                 sublets_api_id, bot_id, group_id)
-                            log(e.message, Color.RED)
+                            log(e, Color.RED)
 
                 # Invalid but they still have time
                 else:
