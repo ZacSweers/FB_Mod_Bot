@@ -21,7 +21,7 @@ def delete_post(usr, pwd, post, *test):
         # or you can use Firefox()
         # or you can use Chrome(executable_path="/usr/bin/chromedriver")
 
-        wait = WebDriverWait(driver, 15)
+        wait = WebDriverWait(driver, 20)
 
         print "--Opening facebook..."
         driver.get("http://www.facebook.com")
