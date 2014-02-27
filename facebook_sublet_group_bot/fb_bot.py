@@ -397,7 +397,7 @@ def sub_group():
         if not check_price_validity(post_message):
             valid_post = False
             post_comment += "- Your post doesn't seem to mention pricing" + \
-                " (no $ signs, <number>/month), or \"per month\")\n"
+                " (no $ signs, <number>/month, or \"per month\")\n"
             log('----$', Color.BLUE)
 
         # Check for tag validity
@@ -405,7 +405,7 @@ def sub_group():
             valid_post = False
             post_comment += \
                 "- Your post appears to be missing a proper tag at the" + \
-                " front ([LOOKING], [ROOMING], or [OFFERING])\n"
+                " front ([LOOKING], [ROOMING], [PARKING], or [OFFERING])\n"
             log('----Tag', Color.BLUE)
 
         # Check post length.
