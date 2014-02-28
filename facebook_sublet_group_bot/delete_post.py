@@ -37,6 +37,9 @@ def delete_post(usr, pwd, post, *test):
         elem = wait.until(ec.presence_of_element_located(
             (By.XPATH, "//a[contains(@class,'fbxWelcomeBoxName')]")))
 
+        # Assert that login was successful
+        assert(elem.text == "Sublets Bot")
+
         print "--Retrieving post..."
         driver.get(post)
 
