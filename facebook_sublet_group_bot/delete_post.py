@@ -33,8 +33,9 @@ def delete_post(usr, pwd, post, *test):
         elem.send_keys(pwd)
         elem.send_keys(Keys.RETURN)
 
-        # Wait for login to finish
-        time.sleep(3)
+        print "--Confirming login"
+        elem = wait.until(ec.presence_of_element_located(
+            (By.XPATH, "//a[contains(@class,'fbxWelcomeBoxName')]")))
 
         print "--Retrieving post..."
         driver.get(post)
