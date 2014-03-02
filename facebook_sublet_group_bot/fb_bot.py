@@ -534,7 +534,7 @@ def sub_group():
     # Keep our warned cache clean
     log('Cleaning warned posts', Color.BOLD)
     already_warned = dict((key, value) for (key, value) in
-                          already_warned if key in processed_posts)
+                          already_warned.items() if key in processed_posts)
 
     # Save the updated caches
     log('Saving warned cache', Color.BOLD)
