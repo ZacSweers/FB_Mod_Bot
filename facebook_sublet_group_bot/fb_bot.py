@@ -261,7 +261,6 @@ def extend_access_token(graph, now_time, saved_props, sublets_api_id,
 
 # Method for retrieving user ID's of admins in group, ignoring bot ID
 def retrieve_admin_ids(group_id, bot_id, auth_token):
-
     # Retrieve the uids via FQL query
     graph = facebook.GraphAPI(auth_token)
     admins_query = \
@@ -318,6 +317,9 @@ def sub_group():
     # IDs of admins (unused right now, might remove later)
     admin_ids = saved_props['admin_ids']
 
+    # Keeping track of the posts we look at here
+    processed_posts = []
+
     # FQL query for the group
     group_query = "SELECT post_id, message, actor_id FROM stream WHERE " + \
                   "source_id=" + group_id + " LIMIT 50"
@@ -370,15 +372,16 @@ def sub_group():
     for post in group_posts:
 
         # Important data received
-        post_message = post['message']      # Content of the post
-        post_id = post['post_id']           # Unique ID of the post
+        post_message = post['message']  # Content of the post
+        post_id = post['post_id']  # Unique ID of the post
+        processed_posts.append(post_id)
 
         # Unique ID of the person that posted it
         actor_id = post['actor_id']
 
         # Ignore mods and certain posts
         if post_id in ignored_post_ids or actor_id in ignore_source_ids or \
-                post_id in valid_posts:
+                        post_id in valid_posts:
             # log('\n--Ignored post: ' + post_id, Color.BLUE)
             continue
 
@@ -397,7 +400,7 @@ def sub_group():
         if not check_price_validity(post_message):
             valid_post = False
             post_comment += "- Your post doesn't seem to mention pricing" + \
-                " (no $ signs, <number>/month, or \"per month\")\n"
+                            " (no $ signs, <number>/month, or \"per month\")\n"
             log('----$', Color.BLUE)
 
         # Check for tag validity
@@ -411,7 +414,7 @@ def sub_group():
         # Check post length.
         # Allow short ones if there's a craigslist link or parking
         if len(post_message) < 200 and \
-                "craigslist" not in post_message.lower() \
+                        "craigslist" not in post_message.lower() \
                 and not check_for_parking_tag(post_message):
             valid_post = False
             post_comment += \
@@ -503,7 +506,7 @@ def sub_group():
                 if not previously_commented:
                     # Comment to post for warning
                     post_comment += \
-                        "\nPlease edit your post and fix the above within 24" +\
+                        "\nPlease edit your post and fix the above within 24" + \
                         " hours, or else your post will be deleted per the" + \
                         " group rules. Thanks!\n\nAn explanation of the" + \
                         " post rules can be found here: http://goo.gl/Z" + \
@@ -548,6 +551,11 @@ def sub_group():
                 # Remove post from list of warned people
                 log('--Removing from cache')
                 del already_warned[post_id]
+
+    # Keep our warned cache clean
+    log('Cleaning warned posts', Color.BOLD)
+    already_warned = [post for post in already_warned if
+                      post not in processed_posts]
 
     # Save the updated caches
     log('Saving warned cache', Color.BOLD)
