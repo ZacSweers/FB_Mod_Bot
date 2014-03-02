@@ -439,38 +439,33 @@ def sub_group():
 
                     # Otherwise message the admins the URL of the post to delete
                     else:
-                        # try:
-                            ## Disabled for now
-                        #     delete_post(saved_props['FB_USER'],
-                        #                 saved_props['FB_PWD'],
-                        #                 url)
-                        #
-                        #     log("--Confirming deletion...")
-                        #     try:
-                        #         # Give it a sec to propagate
-                        #         time.sleep(3)
-                        #         graph.get_object(id=post_id)
-                        #
-                        #         # If it got here something went wrong
-                        #         message_admins(
-                        #             "Please make sure this is gone: " + url,
-                        #             sublets_oauth_access_token,
-                        #             sublets_api_id, bot_id, group_id)
-                        #     except:
-                        #         log("Deletion confirmed ✓", Color.GREEN)
-                        #         del already_warned[post_id]
-                        #
-                        # # Something went wrong, have the admins delete it
-                        # except Exception as e:
-                        #     message_admins(
-                        #         "Delete this post: " + url,
-                        #         sublets_oauth_access_token,
-                        #         sublets_api_id, bot_id, group_id)
-                        #     log(e.message + " - " + str(type(e)), Color.RED)
-                        message_admins(
+                        try:
+                            delete_post(saved_props['FB_USER'],
+                                        saved_props['FB_PWD'],
+                                        url)
+
+                            log("--Confirming deletion...")
+                            try:
+                                # Give it a sec to propagate
+                                time.sleep(3)
+                                graph.get_object(id=post_id)
+
+                                # If it got here something went wrong
+                                message_admins(
+                                    "Please make sure this is gone: " + url,
+                                    sublets_oauth_access_token,
+                                    sublets_api_id, bot_id, group_id)
+                            except:
+                                log("Deletion confirmed ✓", Color.GREEN)
+                                del already_warned[post_id]
+
+                        # Something went wrong, have the admins delete it
+                        except Exception as e:
+                            message_admins(
                                 "Delete this post: " + url,
                                 sublets_oauth_access_token,
                                 sublets_api_id, bot_id, group_id)
+                            log(e.message + " - " + str(type(e)), Color.RED)
 
                 # Invalid but they still have time
                 else:
