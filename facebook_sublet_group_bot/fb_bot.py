@@ -604,12 +604,13 @@ if __name__ == "__main__":
         else:
             sys.exit('No valid args specified')
 
-    try:
-        sub_group()
-    except Exception:
-        if running_on_heroku:
-            # Use raven to capture exceptions and email
-            # Set your raven stuff by installing it in heroku and get the python
-            #   setup info from the Python section
-            client = Client(os.environ.get('RAVEN'))
-            client.captureException()
+    sub_group()
+    # try:
+    #     sub_group()
+    # except Exception:
+    #     if running_on_heroku:
+    #         # Use raven to capture exceptions and email
+    #         # Set your raven stuff by installing it in heroku and get the python
+    #         #   setup info from the Python section
+    #         client = Client(os.environ.get('RAVEN'))
+    #         client.captureException()
