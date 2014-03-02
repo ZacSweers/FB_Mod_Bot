@@ -338,7 +338,7 @@ def sub_group():
     # Load the pickled cache of previously warned posts
     already_warned = dict()
     log("Loading warned cache", Color.BOLD)
-    # already_warned = load_cache(warned_db, already_warned)
+    already_warned = load_cache(warned_db, already_warned)
     log('--Loading cache size: ' + str(len(already_warned)), Color.BOLD)
 
     # Load the pickled cache of valid posts
