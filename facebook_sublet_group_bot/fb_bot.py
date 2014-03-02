@@ -510,8 +510,10 @@ def sub_group():
                     post_comment += \
                         "\nPlease edit your post and fix the above within 24" +\
                         " hours, or else your post will be deleted per the" + \
-                        " group rules. Thanks!\n\n(If you think this was a" + \
-                        " mistake don't hesitate to message me)"
+                        " group rules. Thanks!\n\nAn explanation of the" + \
+                        " post rules can be found here: http://goo.gl/Z" + \
+                        "jxBBp\n\n(If you think this was a mistake don't" + \
+                        " hesitate to message me)"
 
                     graph.put_object(
                         post['post_id'], "comments", message=post_comment)
