@@ -12,7 +12,7 @@ import sys
 import re
 from fbxmpp import SendMsgBot
 from delete_post import delete_post
-from facebook_sublet_group_bot.util import log, Color
+from util import log, Color
 from raven import Client
 
 __author__ = 'Henri Sweers'

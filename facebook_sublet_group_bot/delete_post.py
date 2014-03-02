@@ -6,7 +6,7 @@ import contextlib
 import os
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
-from facebook_sublet_group_bot.util import log, Color
+from util import log, Color
 
 __author__ = 'Henri Sweers'
 
