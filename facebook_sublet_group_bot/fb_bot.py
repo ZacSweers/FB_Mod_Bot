@@ -488,8 +488,8 @@ def sub_group():
                         "\nPlease edit your post and fix the above within 24" + \
                         " hours, or else your post will be deleted per the" + \
                         " group rules. Thanks!\n\nAn explanation of the" + \
-                        " post rules can be found here: http://goo.gl/Z" + \
-                        "jxBBp\n\n(If you think this was a mistake don't" + \
+                        " post rules can be found here in the pinned post." + \
+                        "\n\n(If you think this was a mistake don't" + \
                         " hesitate to message me)"
 
                     graph.put_object(
