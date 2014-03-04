@@ -3,7 +3,6 @@ import os
 import pickle
 import sys
 import time
-from delete_post import delete_post
 import facebook
 
 __author__ = 'Henri Sweers'
@@ -38,9 +37,6 @@ def test():
     # Access token
     sublets_oauth_access_token = saved_props['sublets_oauth_access_token']
 
-    usr = saved_props['FB_USER']
-    pwd = saved_props['FB_PWD']
-
     # ID of the FB group
     group_id = saved_props['group_id']
 
@@ -48,15 +44,13 @@ def test():
 
     obj = graph.put_object(group_id, "feed", message="test")
     postid = obj['id']
-    url = "http://www.facebook.com/" + postid
 
     try:
-        delete_post(usr, pwd, url, test)
+        graph.delete_object(id=postid)
     except Exception as e:
         print 'ERROR: ' + e.message
         print type(e)
-        graph.delete_object(postid)
-        print "Deleted manually"
+        print 'Failed to delete with GraphAPI'
         return False
 
     print "Confirming deletion..."

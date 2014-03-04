@@ -11,7 +11,6 @@ import subprocess
 import sys
 import re
 from fbxmpp import SendMsgBot
-from delete_post import delete_post
 from util import log, Color
 from raven import Client
 
@@ -414,17 +413,11 @@ def sub_group():
                     log('--Delete: ' + post_id, Color.RED)
                     url = "http://www.facebook.com/" + post_id
 
-                    # If local, just open it in a new browser tab
-                    if not running_on_heroku:
-                        webbrowser.open_new_tab(url)
-                        del already_warned[post_id]
-
-                    # Otherwise message the admins the URL of the post to delete
+                    # Try and delete the post with graph. If it fails, message
+                    # the admins and prompt them to delete the post
                     else:
                         try:
-                            delete_post(saved_props['FB_USER'],
-                                        saved_props['FB_PWD'],
-                                        url)
+                            graph.delete_object(id=post_id)
 
                             log("--Confirming deletion...")
                             try:
