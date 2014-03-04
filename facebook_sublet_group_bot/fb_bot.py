@@ -3,7 +3,6 @@
 
 import os
 import cPickle as pickle
-import webbrowser
 import datetime
 import facebook
 import time
@@ -415,32 +414,31 @@ def sub_group():
 
                     # Try and delete the post with graph. If it fails, message
                     # the admins and prompt them to delete the post
-                    else:
+                    try:
+                        graph.delete_object(id=post_id)
+
+                        log("--Confirming deletion...")
                         try:
-                            graph.delete_object(id=post_id)
+                            # Give it a sec to propagate
+                            time.sleep(3)
+                            graph.get_object(id=post_id)
 
-                            log("--Confirming deletion...")
-                            try:
-                                # Give it a sec to propagate
-                                time.sleep(3)
-                                graph.get_object(id=post_id)
-
-                                # If it got here something went wrong
-                                message_admins(
-                                    "Please make sure this is gone: " + url,
-                                    sublets_oauth_access_token,
-                                    sublets_api_id, bot_id, group_id)
-                            except:
-                                log("Deletion confirmed ✓", Color.GREEN)
-                                del already_warned[post_id]
-
-                        # Something went wrong, have the admins delete it
-                        except Exception as e:
+                            # If it got here something went wrong
                             message_admins(
-                                "Delete this post: " + url,
+                                "Please make sure this is gone: " + url,
                                 sublets_oauth_access_token,
                                 sublets_api_id, bot_id, group_id)
-                            log(e.message + " - " + str(type(e)), Color.RED)
+                        except:
+                            log("Deletion confirmed ✓", Color.GREEN)
+                            del already_warned[post_id]
+
+                    # Something went wrong, have the admins delete it
+                    except Exception as e:
+                        message_admins(
+                            "Delete this post: " + url,
+                            sublets_oauth_access_token,
+                            sublets_api_id, bot_id, group_id)
+                        log(e.message + " - " + str(type(e)), Color.RED)
 
                 # Invalid but they still have time
                 else:
