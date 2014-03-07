@@ -299,7 +299,7 @@ def sub_group():
 
     # FQL query for the group
     group_query = "SELECT post_id, message, actor_id FROM stream WHERE " + \
-                  "source_id=" + group_id + " LIMIT 100"
+                  "source_id=" + group_id + " LIMIT 150"
 
     # Get current time
     now_time = time.time()
