@@ -385,7 +385,8 @@ def sub_group():
             valid_post = False
             post_comment += \
                 "- Your post appears to be missing a proper tag at the" + \
-                " front ([LOOKING], [ROOMING], [PARKING], or [OFFERING])\n"
+                " front ([LOOKING], [ROOMING], [PARKING], or [OFFERING]). " + \
+                "Make sure there's a space after each tag.\n"
             log('----Tag', Color.BLUE)
 
         # Check post length.
