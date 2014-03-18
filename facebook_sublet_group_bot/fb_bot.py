@@ -42,12 +42,24 @@ def test():
 
 
 # Method for sending messages, adapted from here: http://goo.gl/oV5KtZ
-def send_message(recipient, botid, message, api_key, access_token):
+def send_message(recipient, message):
+
+    saved_props = load_properties()
+
+    # Access token
+    access_token = saved_props['sublets_oauth_access_token']
+
+    # API App ID
+    api_key = saved_props['sublets_api_id']
+
+    # User ID of the bot
+    botid = str(saved_props['bot_id'])
+
     # The "From" Facebook ID
     jid = botid + '@chat.facebook.com'
 
     # The "Recipient" Facebook ID, with a hyphen for some reason
-    to = '-' + recipient + '@chat.facebook.com'
+    to = '-' + str(recipient) + '@chat.facebook.com'
 
     xmpp = SendMsgBot(jid, to, unicode(message))
 
@@ -259,7 +271,36 @@ def retrieve_admin_ids(group_id, bot_id, auth_token):
 # Extracted logic for messaging admins a message
 def message_admins(message, auth_token, app_id, bot_id, group_id):
     for admin in retrieve_admin_ids(group_id, bot_id, auth_token):
-        send_message(str(admin), str(bot_id), message, app_id, auth_token)
+        send_message(str(admin), message)
+
+
+# Delete posts older than 30 days old
+def delete_old_posts(graph, group_id, admins):
+    old_date = int(time.time()) - 2592000   # 30 days in seconds
+    old_query = "SELECT post_id, message, actor_id FROM stream WHERE " + \
+        "source_id=" + group_id + " AND created_time<" + str(old_date) + \
+        " LIMIT 300"
+    log("Getting posts older than:")
+    log("\t" + datetime.datetime.fromtimestamp(old_date)
+        .strftime('%Y-%m-%d %H:%M:%S'))
+    posts = graph.fql(query=old_query)
+    log("Deleting " + str(len(posts)) + " posts", Color.RED)
+    for post in posts:
+        post_message = post['message']
+        post_id = post['post_id']
+        actor_id = post['actor_id']
+
+        if str(actor_id) not in admins:
+            message = "We are deleting old posts. Your post's message is pasted" + \
+                " below. Feel free to repost it if you still need to.\n\n" + \
+                      post_message
+
+            send_message(actor_id, message)
+            log("\tDeleting " + post_id, Color.RED)
+            graph.delete_object(id=post_id)
+            time.sleep(2)
+        else:
+            log("\tSkipping admin post: " + post_id, Color.BLUE)
 
 
 # Main runner method
@@ -513,15 +554,16 @@ def sub_group():
                         # Message the user notifying them the comment is deleted
                         # and thank them for fixing their post
                         log('--Thanking user')
-                        send_message(str(actor_id), str(bot_id),
+                        send_message(str(actor_id),
                                      "Thank you for fixing your post," +
-                                     " I have removed the warning comment.",
-                                     str(sublets_api_id),
-                                     str(sublets_oauth_access_token))
+                                     " I have removed the warning comment.")
 
                 # Remove post from list of warned people
                 log('--Removing from cache')
                 del already_warned[post_id]
+
+    # Delete posts older than 30 days
+    delete_old_posts(graph, group_id, admin_ids)
 
     # Keep our warned cache clean
     log('Cleaning warned posts', Color.BOLD)
@@ -551,10 +593,7 @@ if __name__ == "__main__":
 
         # Authenticate Memcached
         running_on_heroku = True
-        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').
-                               split(','),
-                               os.environ.get('MEMCACHEDCLOUD_USERNAME'),
-                               os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
+        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').split(','), os.environ.get('MEMCACHEDCLOUD_USERNAME'), os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
 
     args = sys.argv
     # parser = argparse.ArgumentParser()
