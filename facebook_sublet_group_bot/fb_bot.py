@@ -290,12 +290,12 @@ def delete_old_posts(graph, group_id, admins):
         post_id = post['post_id']
         actor_id = post['actor_id']
 
-        if str(actor_id) not in admins:
+        if int(actor_id) not in admins:
             message = "We are deleting old posts. Your post's message is pasted" + \
                 " below. Feel free to repost it if you still need to.\n\n" + \
                       post_message
 
-            send_message(actor_id, message)
+            send_message(str(actor_id), message)
             log("\tDeleting " + post_id, Color.RED)
             graph.delete_object(id=post_id)
             time.sleep(2)
@@ -399,7 +399,7 @@ def sub_group():
 
         # Ignore mods and certain posts
         if post_id in ignored_post_ids or actor_id in ignore_source_ids or \
-                        post_id in valid_posts:
+                        post_id in valid_posts or int(actor_id) in admin_ids:
             # log('\n--Ignored post: ' + post_id, Color.BLUE)
             continue
 
