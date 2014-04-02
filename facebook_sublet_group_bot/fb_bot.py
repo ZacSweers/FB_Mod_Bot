@@ -423,7 +423,7 @@ def sub_group():
         if not check_price_validity(post_message):
             valid_post = False
             invalid_count += 1
-            post_comment += "- Please give some sort of pricing (use dollar signs!)"
+            post_comment += "- Please give some sort of pricing (use dollar signs!)\n"
             log('----$', Color.BLUE)
 
         # Check for tag validity
@@ -431,7 +431,7 @@ def sub_group():
             valid_post = False
             invalid_count += 1
             post_comment += \
-                "- You didn't include a proper tag"
+                "- You didn't include a proper tag\n"
             log('----Tag', Color.BLUE)
 
         # Check post length.
@@ -442,7 +442,7 @@ def sub_group():
             valid_post = False
             invalid_count += 1
             post_comment += \
-                "- Not enough details, please give some more info"
+                "- Not enough details, please give some more info\n"
             log('----Length', Color.BLUE)
 
         # Not a valid post
@@ -526,7 +526,7 @@ def sub_group():
                 if not previously_commented:
                     # Comment to post for warning
                     post_comment += \
-                        "\n\nEdit your post and fix the above within 24" + \
+                        "\nEdit your post and fix the above within 24" + \
                         " hours, or else your post will be deleted per the" + \
                         " group rules. Thanks!"
 
