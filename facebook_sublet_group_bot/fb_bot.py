@@ -43,7 +43,6 @@ def test():
 
 # Method for sending messages, adapted from here: http://goo.gl/oV5KtZ
 def send_message(recipient, message):
-
     saved_props = load_properties()
 
     # Access token
@@ -276,10 +275,10 @@ def message_admins(message, auth_token, app_id, bot_id, group_id):
 
 # Delete posts older than 30 days old
 def delete_old_posts(graph, group_id, admins):
-    old_date = int(time.time()) - 2592000   # 30 days in seconds
+    old_date = int(time.time()) - 2592000  # 30 days in seconds
     old_query = "SELECT post_id, message, actor_id FROM stream WHERE " + \
-        "source_id=" + group_id + " AND created_time<" + str(old_date) + \
-        " LIMIT 300"
+                "source_id=" + group_id + " AND created_time<" + str(old_date) + \
+                " LIMIT 300"
     log("Getting posts older than:")
     log("\t" + datetime.datetime.fromtimestamp(old_date)
         .strftime('%Y-%m-%d %H:%M:%S'))
@@ -450,9 +449,9 @@ def sub_group():
         if not valid_post:
 
             if invalid_count > 1:
-                post_comment = "Hey buddy, your post has some issues\n"
+                post_comment = "Hey buddy, your post has some issues:\n" + post_comment
             else:
-                post_comment = "Hey buddy, your post has an issue\n"
+                post_comment = "Hey buddy, your post has an issue:\n" + post_comment
 
             # If already warned, delete if it's been more than 24 hours, ignore
             # if it's been less
@@ -527,7 +526,7 @@ def sub_group():
                 if not previously_commented:
                     # Comment to post for warning
                     post_comment += \
-                        "\nPlease edit your post and fix the above within 24" + \
+                        "\n\nEdit your post and fix the above within 24" + \
                         " hours, or else your post will be deleted per the" + \
                         " group rules. Thanks!"
 
@@ -599,7 +598,7 @@ if __name__ == "__main__":
 
         # Authenticate Memcached
         running_on_heroku = True
-        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').split(','), os.environ.get('MEMCACHEDCLOUD_USERNAME'), os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
+        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').split(','),os.environ.get('MEMCACHEDCLOUD_USERNAME'),os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
 
     args = sys.argv
     # parser = argparse.ArgumentParser()
