@@ -286,21 +286,25 @@ def delete_old_posts(graph, group_id, admins):
     posts = graph.fql(query=old_query)
     log("Deleting " + str(len(posts)) + " posts", Color.RED)
     for post in posts:
-        post_message = post['message']
         post_id = post['post_id']
-        actor_id = post['actor_id']
+        graph.delete_object(id=post_id)
 
-        if int(actor_id) not in admins:
-            message = "We are deleting old posts. Your post's message is pasted" + \
-                " below. Feel free to repost it if you still need to.\n\n" + \
-                      post_message
-
-            send_message(str(actor_id), message)
-            log("\tDeleting " + post_id, Color.RED)
-            graph.delete_object(id=post_id)
-            time.sleep(2)
-        else:
-            log("\tSkipping admin post: " + post_id, Color.BLUE)
+        ## Old stuff messaging users their post
+        # post_message = post['message']
+        # post_id = post['post_id']
+        # actor_id = post['actor_id']
+        #
+        # if int(actor_id) not in admins:
+        #     message = "We are deleting old posts. Your post's message is pasted" + \
+        #         " below. Feel free to repost it if you still need to.\n\n" + \
+        #               post_message
+        #
+        #     send_message(str(actor_id), message)
+        #     log("\tDeleting " + post_id, Color.RED)
+        #     graph.delete_object(id=post_id)
+        #     time.sleep(2)
+        # else:
+        #     log("\tSkipping admin post: " + post_id, Color.BLUE)
 
 
 # Main runner method
@@ -404,11 +408,13 @@ def sub_group():
             continue
 
         # Data to use
-        post_comment = "(This is an automated comment)\n\nIt looks like" + \
-                       " your post has a few issues:\n"
+        post_comment = ""
 
         # Boolean for tracking if the post is valid
         valid_post = True
+
+        # Counter for multiple items
+        invalid_count = 0
 
         # Log the message details
         log("\n" + post_message[0:75].replace('\n', "") + "...\n--POST ID: " +
@@ -417,17 +423,16 @@ def sub_group():
         # Check for pricing
         if not check_price_validity(post_message):
             valid_post = False
-            post_comment += "- Your post doesn't seem to mention pricing" + \
-                            " (no $ signs, <number>/month, or \"per month\")\n"
+            invalid_count += 1
+            post_comment += "- Please give some sort of pricing (use dollar signs!)"
             log('----$', Color.BLUE)
 
         # Check for tag validity
         if not check_tag_validity(post_message):
             valid_post = False
+            invalid_count += 1
             post_comment += \
-                "- Your post appears to be missing a proper tag at the" + \
-                " front ([LOOKING], [ROOMING], [PARKING], or [OFFERING]). " + \
-                "Make sure there's a space after each tag.\n"
+                "- You didn't include a proper tag"
             log('----Tag', Color.BLUE)
 
         # Check post length.
@@ -436,14 +441,18 @@ def sub_group():
                         "craigslist" not in post_message.lower() \
                 and not check_for_parking_tag(post_message):
             valid_post = False
+            invalid_count += 1
             post_comment += \
-                "- Your post is a little short (<200 chars). Please give" + \
-                " more information (what you're looking for, details," + \
-                " preferences, etc.)\n"
+                "- Not enough details, please give some more info"
             log('----Length', Color.BLUE)
 
         # Not a valid post
         if not valid_post:
+
+            if invalid_count > 1:
+                post_comment = "Hey buddy, your post has some issues\n"
+            else:
+                post_comment = "Hey buddy, your post has an issue\n"
 
             # If already warned, delete if it's been more than 24 hours, ignore
             # if it's been less
@@ -520,10 +529,7 @@ def sub_group():
                     post_comment += \
                         "\nPlease edit your post and fix the above within 24" + \
                         " hours, or else your post will be deleted per the" + \
-                        " group rules. Thanks!\n\nAn explanation of the" + \
-                        " post rules can be found here in the pinned post." + \
-                        "\n\n(If you think this was a mistake don't" + \
-                        " hesitate to message me)"
+                        " group rules. Thanks!"
 
                     graph.put_object(
                         post['post_id'], "comments", message=post_comment)
@@ -552,11 +558,11 @@ def sub_group():
                         log('--Warning deleted')
 
                         # Message the user notifying them the comment is deleted
-                        # and thank them for fixing their post
-                        log('--Thanking user')
-                        send_message(str(actor_id),
-                                     "Thank you for fixing your post," +
-                                     " I have removed the warning comment.")
+                        # and thank them for fixing their post. Disabled for now
+                        # log('--Thanking user')
+                        # send_message(str(actor_id),
+                        #              "Thanks for fixing your post," +
+                        #              " I removed the warning comment.")
 
                 # Remove post from list of warned people
                 log('--Removing from cache')
