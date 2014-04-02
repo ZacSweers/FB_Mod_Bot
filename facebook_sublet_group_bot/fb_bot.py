@@ -551,7 +551,7 @@ def sub_group():
                                  " WHERE post_id=\"" + str(post_id) + "\""
                 comments = graph.fql(comments_query)
                 for comment in comments:
-                    if comment['fromid'] == str(bot_id):
+                    if comment['fromid'] == int(bot_id):
                         # Delete warning comment
                         graph.delete_object(comment['id'])
                         log('--Warning deleted')
