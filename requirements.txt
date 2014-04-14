@@ -4,3 +4,4 @@ python-binary-memcached==0.21
 selenium==2.39.0
 raven==4.0.4
 pyimgur==0.5.2
+facepy==0.9.0
