@@ -174,6 +174,7 @@ def update_token(token):
         graph.get('me/posts')
         props = load_properties()
         props['sublets_oauth_access_token'] = token
+        props['access_token_expiration'] = time.time() + 7200  # 2 hours buffer
         save_properties(props)
         log("Token updated, you should now extend it", Color.BLUE)
     except:
