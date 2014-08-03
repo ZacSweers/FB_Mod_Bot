@@ -175,6 +175,7 @@ def update_token(token):
         props = load_properties()
         props['sublets_oauth_access_token'] = token
         save_properties(props)
+        log("Token updated, you should now extend it", Color.BLUE)
     except:
         log("Invalid token", Color.RED)
 
