@@ -5,6 +5,7 @@ import os
 import cPickle as pickle
 import datetime
 import facepy
+import getopt
 import time
 import subprocess
 import sys
@@ -165,6 +166,18 @@ def notify_mac():
         except OSError:
             print "If you have terminal-notifier, this would be a notification"
 
+# Manually update API token
+def update_token(token):
+    log("Updating token", Color.BLUE)
+    graph = facepy.GraphAPI(token)
+    try:
+        graph.get('me/posts')
+        props = load_properties()
+        props['sublets_oauth_access_token'] = token
+        save_properties(props)
+    except:
+        log("Invalid token", Color.RED)
+
 
 # Method for checking tag validity
 def check_tag_validity(message_text):
@@ -308,13 +321,13 @@ def sub_group():
         global extend_key
         extend_key = True
 
-    # Log in, try to get posts
-    graph = facepy.GraphAPI(sublets_oauth_access_token)
-
     # Extend the access token, default is ~2 months from current date
     if extend_key:
         extend_access_token(now_time, saved_props, sublets_oauth_access_token, sublets_api_id,
                             sublets_secret_key)
+
+    # Log in, try to get posts
+    graph = facepy.GraphAPI(sublets_oauth_access_token)
 
     # Make our first request, get the group posts
     group_posts = graph.fql(query=group_query)
@@ -384,6 +397,13 @@ def sub_group():
 
 # Main method
 if __name__ == "__main__":
+
+    try:
+      opts, args = getopt.getopt(sys.argv[1:], "esu:", ["extend", "setprops", "token="])
+    except getopt.GetoptError:
+      print 'check_and_delete.py -e -s -u <token>'
+      sys.exit(2)
+
     # Check to see if we're running on Heroku
     if os.environ.get('MEMCACHEDCLOUD_SERVERS', None):
         import bmemcached
@@ -394,16 +414,19 @@ if __name__ == "__main__":
         running_on_heroku = True
         mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').split(','),os.environ.get('MEMCACHEDCLOUD_USERNAME'),os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
 
-    args = sys.argv
+    if len(opts) != 0:
+        for o, a in opts:
+            if o in ("-e", "--extend"):
+                extend_key = True
+            elif o in ("-s", "--setprops"):
+                set_new_props()
+                sys.exit()
+            elif o in ("-u", "--update"):
+                update_token(a)
+                sys.exit()
+            else:
+                sys.exit('No valid args specified')
 
-    # Arg parsing. I know, there's better ways to do this
-    if len(args) > 1:
-        if "--extend" in args:
-            extend_key = True
-        elif "setprops" in args:
-            set_new_props()
-            sys.exit()
-        else:
-            sys.exit('No valid args specified')
-
-    sub_group()
+        sub_group()
+    else:
+        sys.exit('No valid args specified')
