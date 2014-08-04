@@ -180,6 +180,21 @@ def update_token(token):
     except:
         log("Invalid token", Color.RED)
 
+# Set a property by name
+def update_prop(propname, value):
+    if propname in ("sublets_oauth_access_token", "access_token_expiration"):
+        log("Please use -u or -e to update or extend tokens", Color.RED)
+        return
+    log("Setting \"" + propname + "\" to \"" + value + "\"", Color.BLUE)
+    props = load_properties()
+    if propname not in props.keys():
+        response = raw_input("This key doesn't exist, do you want to add it? Y/N")
+        if (response.lower() != "y"):
+            return
+    props[propname] = value
+    save_properties(props)
+    log("Done setting \"" + propname + "\"", Color.BLUE)
+
 
 # Method for checking tag validity
 def check_tag_validity(message_text):
@@ -264,7 +279,7 @@ def delete_old_posts(graph, group_id, admin_ids):
     log("\t" + datetime.datetime.fromtimestamp(old_date)
         .strftime('%Y-%m-%d %H:%M:%S'))
     posts = graph.fql(query=old_query)
-    log("Deleting " + str(len(posts["data"])) + " posts", Color.RED)
+    deleted_posts_count = 0
     for post in posts["data"]:
         post_id = post['post_id']
         actor_id = post['actor_id']
@@ -273,6 +288,8 @@ def delete_old_posts(graph, group_id, admin_ids):
             continue
         print post_id
         graph.delete(post_id)
+        deleted_posts_count += 1
+    log("Deleted " + str(deleted_posts_count) + " posts", Color.RED)
 
 
 # Main runner method
@@ -401,9 +418,9 @@ def sub_group():
 if __name__ == "__main__":
 
     try:
-      opts, args = getopt.getopt(sys.argv[1:], "esu:", ["extend", "setprops", "token="])
+      opts, args = getopt.getopt(sys.argv[1:], "pesu:n:v:", ["printprops", "extend", "setprops", "token=", "propname=", "propvalue="])
     except getopt.GetoptError:
-      print 'check_and_delete.py -e -s -u <token>'
+      print 'check_and_delete.py -p -e -s -u <token> -n <propname> -v <propvalue>'
       sys.exit(2)
 
     # Check to see if we're running on Heroku
@@ -416,6 +433,8 @@ if __name__ == "__main__":
         running_on_heroku = True
         mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').split(','),os.environ.get('MEMCACHEDCLOUD_USERNAME'),os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
 
+    propname = None
+    propval = None
     if len(opts) != 0:
         for o, a in opts:
             if o in ("-e", "--extend"):
@@ -426,7 +445,21 @@ if __name__ == "__main__":
             elif o in ("-u", "--update"):
                 update_token(a)
                 sys.exit()
+            elif o in ("-n", "--propname"):
+                propname = a
+            elif o in ("-v", "--propvalue"):
+                propval = a
+            elif o in ("-p", "--printprops"):
+                print load_properties().keys()
+                sys.exit()
             else:
                 sys.exit('No valid args specified')
 
-    sub_group()
+    if propname or propval:
+        if propname and propval:
+            log(propname + propval)
+            update_prop(propname, propval)
+        else:
+            sys.exit('Must specify a prop name and value')
+    else:
+        sub_group()
