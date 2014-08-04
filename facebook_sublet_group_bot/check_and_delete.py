@@ -429,6 +429,4 @@ if __name__ == "__main__":
             else:
                 sys.exit('No valid args specified')
 
-        sub_group()
-    else:
-        sys.exit('No valid args specified')
+    sub_group()
