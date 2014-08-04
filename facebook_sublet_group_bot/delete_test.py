@@ -43,7 +43,6 @@ def test():
     graph = facepy.GraphAPI(sublets_oauth_access_token)
 
     obj = graph.post(group_id + "/feed", message="test")
-    print obj
     postid = obj['id']
 
     try:
