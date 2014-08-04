@@ -423,9 +423,9 @@ def sub_group():
 if __name__ == "__main__":
 
     try:
-      opts, args = getopt.getopt(sys.argv[1:], "pesu:n:v:", ["printprops", "extend", "setprops", "token=", "propname=", "propvalue="])
+      opts, args = getopt.getopt(sys.argv[1:], "pesu:n:v:g:", ["printprops", "extend", "setprops", "token=", "propname=", "propvalue=", "propname="])
     except getopt.GetoptError:
-      print 'check_and_delete.py -p -e -s -u <token> -n <propname> -v <propvalue>'
+      print 'check_and_delete.py -p -e -s -u <token> -n <propname> -v <propvalue> -g <propname>'
       sys.exit(2)
 
     # Check to see if we're running on Heroku
@@ -458,6 +458,13 @@ if __name__ == "__main__":
                 log("Printing props", Color.BLUE)
                 props = load_properties()
                 print props.keys()
+                sys.exit()
+            elif o in ("-g", "--getprop"):
+                log("Getting value for " + a, Color.BLUE)
+                props = load_properties()
+                if a not in props.keys():
+                    sys.exit(a + " doesn't exist in props")
+                print props[a]
                 sys.exit()
             else:
                 sys.exit('No valid args specified')
