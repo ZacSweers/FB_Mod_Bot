@@ -284,7 +284,7 @@ def delete_old_posts(graph, group_id, admin_ids):
         post_id = post['post_id']
         actor_id = post['actor_id']
         if int(actor_id) in admin_ids:
-            log('\n--Ignored post: ' + post_id, Color.BLUE)
+            # log('\n--Ignored post: ' + post_id, Color.BLUE)
             continue
         print post_id
         graph.delete(post_id)
@@ -450,7 +450,9 @@ if __name__ == "__main__":
             elif o in ("-v", "--propvalue"):
                 propval = a
             elif o in ("-p", "--printprops"):
-                print load_properties().keys()
+                log("Printing props", Color.BLUE)
+                props = load_properties()
+                print props.keys()
                 sys.exit()
             else:
                 sys.exit('No valid args specified')
