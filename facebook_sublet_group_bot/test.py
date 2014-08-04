@@ -49,35 +49,35 @@ class TestTagValidity(unittest.TestCase):
             to illustrate lots more text here in the rest of the post"""
 
     def test_regular(self):
-        from fb_bot import check_tag_validity
+        from check_and_delete import get_tags
         for tag in self.test_tags:
-            self.assertTrue(check_tag_validity("(" + tag + ")"))
-            self.assertTrue(check_tag_validity("{" + tag + "}"))
-            self.assertTrue(check_tag_validity("[" + tag + "]"))
-            self.assertTrue(check_tag_validity("(" + tag + "]"))
-            self.assertTrue(check_tag_validity("{" + tag + "]"))
-            self.assertTrue(check_tag_validity("(" + tag + "}"))
-            self.assertTrue(check_tag_validity("{" + tag + ")"))
-            self.assertFalse(check_tag_validity(tag + ")"))
-            self.assertFalse(check_tag_validity("{" + tag))
-            self.assertFalse(check_tag_validity(tag))
+            self.assertTrue(len(get_tags("(" + tag + ")")) > 0)
+            self.assertTrue(len(get_tags("{" + tag + "}")) > 0)
+            self.assertTrue(len(get_tags("[" + tag + "]")) > 0)
+            self.assertTrue(len(get_tags("(" + tag + "]")) > 0)
+            self.assertTrue(len(get_tags("{" + tag + "]")) > 0)
+            self.assertTrue(len(get_tags("(" + tag + "}")) > 0)
+            self.assertTrue(len(get_tags("{" + tag + ")")) > 0)
+            self.assertFalse(len(get_tags(tag + ")")) > 0)
+            self.assertFalse(len(get_tags("{" + tag)) > 0)
+            self.assertFalse(len(get_tags(tag)) > 0)
 
     def test_misc(self):
-        from fb_bot import check_tag_validity
+        from check_and_delete import get_tags
         for tag in self.test_tags:
-            self.assertTrue(check_tag_validity("(" + tag + ") sometjunk"))
-            self.assertFalse(check_tag_validity("{" + tag + "}" + self.junk))
-            self.assertFalse(check_tag_validity("dsflkj{" + tag.lower() + ")"))
-            self.assertFalse(check_tag_validity("dsflkj {" + tag.lower() + ")"))
-            self.assertTrue(check_tag_validity("-(" + tag + ")"))
-            self.assertTrue(check_tag_validity("*(" + tag + ")"))
-            self.assertTrue(check_tag_validity("* (" + tag + ")"))
-            self.assertTrue(check_tag_validity(" (" + tag + ")"))
-            self.assertTrue(check_tag_validity("(" + tag + "):"))
-            self.assertTrue(check_tag_validity("(" + tag + ") :"))
+            self.assertTrue(len(get_tags("(" + tag + ") sometjunk")) > 0)
+            self.assertFalse(len(get_tags("{" + tag + "}" + self.junk)) > 0)
+            self.assertFalse(len(get_tags("dsflkj{" + tag.lower() + ")")) > 0)
+            self.assertFalse(len(get_tags("dsflkj {" + tag.lower() + ")")) > 0)
+            self.assertTrue(len(get_tags("-(" + tag + ")")) > 0)
+            self.assertTrue(len(get_tags("*(" + tag + ")")) > 0)
+            self.assertTrue(len(get_tags("* (" + tag + ")")) > 0)
+            self.assertTrue(len(get_tags(" (" + tag + ")")) > 0)
+            self.assertTrue(len(get_tags("(" + tag + "):")) > 0)
+            self.assertTrue(len(get_tags("(" + tag + ") :")) > 0)
 
     def test_parking(self):
-        from fb_bot import check_for_parking_tag
+        from check_and_delete import check_for_parking_tag
         tag = "parking"
         self.assertTrue(check_for_parking_tag("(" + tag + ")"))
         self.assertTrue(check_for_parking_tag("{" + tag + "}"))
@@ -107,7 +107,7 @@ class TestPriceValidity(unittest.TestCase):
             to illustrate lots more text here in the rest of the post"""
 
     def test_regular_month(self):
-        from fb_bot import check_price_validity
+        from check_and_delete import check_price_validity
         self.assertTrue(check_price_validity("Blah blah $ blah"))
         self.assertTrue(check_price_validity("Blah blah 300 per month"))
         self.assertTrue(check_price_validity("Blah blah 300/month"))
@@ -119,7 +119,7 @@ class TestPriceValidity(unittest.TestCase):
         self.assertTrue(check_price_validity("Blah blah 300 a/month"))
 
     def test_embedded_month(self):
-        from fb_bot import check_price_validity
+        from check_and_delete import check_price_validity
         self.assertTrue(check_price_validity("Blah $ blah" + self.junk))
         self.assertTrue(check_price_validity("Blah 300 per month" + self.junk))
         self.assertTrue(check_price_validity("Blah 300/month" + self.junk))
@@ -131,7 +131,7 @@ class TestPriceValidity(unittest.TestCase):
         self.assertTrue(check_price_validity("Blah 300 a/month" + self.junk))
 
     def test_misc_month(self):
-        from fb_bot import check_price_validity
+        from check_and_delete import check_price_validity
         self.assertTrue(check_price_validity("Blah$ blah" + self.junk))
         self.assertTrue(check_price_validity("Blah300 per month" + self.junk))
         self.assertTrue(check_price_validity("Blah blah 300permonth"))
@@ -139,7 +139,7 @@ class TestPriceValidity(unittest.TestCase):
         self.assertTrue(check_price_validity("Blah blah 300amonth"))
 
     def test_regular_mon(self):
-        from fb_bot import check_price_validity
+        from check_and_delete import check_price_validity
         self.assertTrue(check_price_validity("Blah blah $ blah"))
         self.assertTrue(check_price_validity("Blah blah 300 per mon"))
         self.assertTrue(check_price_validity("Blah blah 300/mon"))
@@ -151,7 +151,7 @@ class TestPriceValidity(unittest.TestCase):
         self.assertTrue(check_price_validity("Blah blah 300 a/mon"))
 
     def test_embedded_mon(self):
-        from fb_bot import check_price_validity
+        from check_and_delete import check_price_validity
         self.assertTrue(check_price_validity("Blah $ blah" + self.junk))
         self.assertTrue(check_price_validity("Blah 300 per mon" + self.junk))
         self.assertTrue(check_price_validity("Blah 300/mon" + self.junk))
@@ -163,7 +163,7 @@ class TestPriceValidity(unittest.TestCase):
         self.assertTrue(check_price_validity("Blah 300 a/mon" + self.junk))
 
     def test_misc_mon(self):
-        from fb_bot import check_price_validity
+        from check_and_delete import check_price_validity
         self.assertTrue(check_price_validity("Blah$ blah" + self.junk))
         self.assertTrue(check_price_validity("Blah300 per mon" + self.junk))
         self.assertTrue(check_price_validity("Blah blah 300permon"))
@@ -171,7 +171,7 @@ class TestPriceValidity(unittest.TestCase):
         self.assertTrue(check_price_validity("Blah blah 300amon"))
 
     def test_regular_mo(self):
-        from fb_bot import check_price_validity
+        from check_and_delete import check_price_validity
         self.assertTrue(check_price_validity("Blah blah $ blah"))
         self.assertTrue(check_price_validity("Blah blah 300 per mo"))
         self.assertTrue(check_price_validity("Blah blah 300/mo"))
@@ -183,7 +183,7 @@ class TestPriceValidity(unittest.TestCase):
         self.assertTrue(check_price_validity("Blah blah 300 a/mo"))
 
     def test_embedded_mo(self):
-        from fb_bot import check_price_validity
+        from check_and_delete import check_price_validity
         self.assertTrue(check_price_validity("Blah $ blah" + self.junk))
         self.assertTrue(check_price_validity("Blah 300 per mo" + self.junk))
         self.assertTrue(check_price_validity("Blah 300/mo" + self.junk))
@@ -195,7 +195,7 @@ class TestPriceValidity(unittest.TestCase):
         self.assertTrue(check_price_validity("Blah 300 a/mo" + self.junk))
 
     def test_misc_mo(self):
-        from fb_bot import check_price_validity
+        from check_and_delete import check_price_validity
         self.assertTrue(check_price_validity("Blah$ blah" + self.junk))
         self.assertTrue(check_price_validity("Blah300 per mo" + self.junk))
         self.assertTrue(check_price_validity("Blah blah 300permo"))

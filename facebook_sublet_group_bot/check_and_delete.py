@@ -34,6 +34,9 @@ extend_key = False
 # Boolean for checking heroku
 running_on_heroku = False
 
+# Tags: allowed leading characters
+allowed_leading_characters = ('*', '-')
+
 
 # Junk method that I use for testing stuff periodically
 def test():
@@ -197,15 +200,17 @@ def update_prop(propname, value):
 
 
 # Method for checking tag validity
-def check_tag_validity(message_text):
+def get_tags(message_text):
     p = re.compile(
         "^(-|\*| )*([\(\[\{])((looking)|(rooming)|(offering)|(parking))([\)\]\}])(:)?(\s|$)",
         re.IGNORECASE)
 
-    if re.match(p, message_text):
-        return True
-    else:
-        return False
+    split = message_text.strip().split(" ")
+
+    if not p.match(split[0]) and split[0] not in allowed_leading_characters:
+        return []
+
+    return [l[1:-1] for l in split for m in (p.search(l),) if m]
 
 
 # Method for checking if pricing reference is there
@@ -385,7 +390,7 @@ def sub_group():
             log('----$', Color.BLUE)
 
         # Check for tag validity
-        if not check_tag_validity(post_message):
+        if not get_tags(post_message):
             valid_post = False
             log('----Tag', Color.BLUE)
 

@@ -3,7 +3,7 @@ import os
 import pickle
 import sys
 import time
-import facebook
+import facepy
 
 __author__ = 'Henri Sweers'
 
@@ -40,13 +40,13 @@ def test():
     # ID of the FB group
     group_id = saved_props['group_id']
 
-    graph = facebook.GraphAPI(sublets_oauth_access_token)
+    graph = facepy.GraphAPI(sublets_oauth_access_token)
 
-    obj = graph.put_object(group_id, "feed", message="test")
-    postid = obj['id']
+    obj = graph.post(group_id + "/feed", message="test")
+    postid = obj["data"]['id']
 
     try:
-        graph.delete_object(id=postid)
+        graph.delete(postid)
     except Exception as e:
         print 'ERROR: ' + e.message
         print type(e)
@@ -56,7 +56,7 @@ def test():
     print "Confirming deletion..."
     time.sleep(2)
     try:
-        print graph.get_object(id=postid)
+        print graph.get(str(postid))
         return False
     except:
         print "Deletion confirmed ✓"
