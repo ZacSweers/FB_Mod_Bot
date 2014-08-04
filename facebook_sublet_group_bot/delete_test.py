@@ -43,7 +43,8 @@ def test():
     graph = facepy.GraphAPI(sublets_oauth_access_token)
 
     obj = graph.post(group_id + "/feed", message="test")
-    postid = obj["data"]['id']
+    print obj
+    postid = obj['id']
 
     try:
         graph.delete(postid)
