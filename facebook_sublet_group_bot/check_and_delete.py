@@ -390,7 +390,7 @@ def sub_group():
             log('----$', Color.BLUE)
 
         # Check for tag validity
-        if not get_tags(post_message):
+        if not get_tags(post_message) > 0:
             valid_post = False
             log('----Tag', Color.BLUE)
 
