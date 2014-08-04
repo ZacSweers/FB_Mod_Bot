@@ -8,28 +8,6 @@ __author__ = 'Henri Sweers'
 import unittest
 
 
-def load_properties():
-    prop_file = "login_prop"
-    if os.environ.get('MEMCACHEDCLOUD_SERVERS', None):
-        import bmemcached
-        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').
-                               split(','),
-                               os.environ.get('MEMCACHEDCLOUD_USERNAME'),
-                               os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
-        obj = mc.get('props')
-        if not obj:
-            return {}
-        else:
-            return obj
-    else:
-        if os.path.isfile(prop_file):
-            with open(prop_file, 'r+') as login_prop_file:
-                data = pickle.load(login_prop_file)
-                return data
-        else:
-            sys.exit("No prop file found")
-
-
 # Nifty method for sending notifications on my mac when it's done
 def notify_mac():
     if sys.platform == "darwin":
