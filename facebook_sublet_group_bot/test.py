@@ -29,30 +29,31 @@ class TestTagValidity(unittest.TestCase):
     def test_regular(self):
         from check_and_delete import get_tags
         for tag in self.test_tags:
-            self.assertTrue(len(get_tags("(" + tag + ")")) > 0)
-            self.assertTrue(len(get_tags("{" + tag + "}")) > 0)
-            self.assertTrue(len(get_tags("[" + tag + "]")) > 0)
-            self.assertTrue(len(get_tags("(" + tag + "]")) > 0)
-            self.assertTrue(len(get_tags("{" + tag + "]")) > 0)
-            self.assertTrue(len(get_tags("(" + tag + "}")) > 0)
-            self.assertTrue(len(get_tags("{" + tag + ")")) > 0)
-            self.assertFalse(len(get_tags(tag + ")")) > 0)
-            self.assertFalse(len(get_tags("{" + tag)) > 0)
-            self.assertFalse(len(get_tags(tag)) > 0)
+            self.assertTrue(get_tags("(" + tag + ")"))
+            self.assertTrue(get_tags("{" + tag + "}"))
+            self.assertTrue(get_tags("[" + tag + "]"))
+            self.assertTrue(get_tags("(" + tag + "]"))
+            self.assertTrue(get_tags("{" + tag + "]"))
+            self.assertTrue(get_tags("(" + tag + "}"))
+            self.assertTrue(get_tags("{" + tag + ")"))
+            self.assertFalse(get_tags(tag + ")"))
+            self.assertFalse(get_tags("{" + tag))
+            self.assertFalse(get_tags(tag))
 
     def test_misc(self):
         from check_and_delete import get_tags
         for tag in self.test_tags:
-            self.assertTrue(len(get_tags("(" + tag + ") sometjunk")) > 0)
-            self.assertFalse(len(get_tags("{" + tag + "}" + self.junk)) > 0)
-            self.assertFalse(len(get_tags("dsflkj{" + tag.lower() + ")")) > 0)
-            self.assertFalse(len(get_tags("dsflkj {" + tag.lower() + ")")) > 0)
-            self.assertTrue(len(get_tags("-(" + tag + ")")) > 0)
-            self.assertTrue(len(get_tags("*(" + tag + ")")) > 0)
-            self.assertTrue(len(get_tags("* (" + tag + ")")) > 0)
-            self.assertTrue(len(get_tags(" (" + tag + ")")) > 0)
-            self.assertTrue(len(get_tags("(" + tag + "):")) > 0)
-            self.assertTrue(len(get_tags("(" + tag + ") :")) > 0)
+            self.assertTrue(get_tags("(" + tag + ") sometjunk"))
+            self.assertFalse(get_tags("{" + tag + "}" + self.junk))
+            self.assertFalse(get_tags("dsflkj{" + tag.lower() + ")"))
+            self.assertFalse(get_tags("dsflkj {" + tag.lower() + ")"))
+            self.assertTrue(get_tags("-(" + tag + ")"))
+            self.assertTrue(get_tags("*(" + tag + ")"))
+            self.assertTrue(get_tags("* (" + tag + ")"))
+            self.assertTrue(get_tags(" (" + tag + ")"))
+            self.assertTrue(get_tags("(" + tag + "):"))
+            self.assertTrue(get_tags("(" + tag + ") :"))
+            self.assertFalse(get_tags("(" + tag + ")(" + tag + ")"))
 
     def test_parking(self):
         from check_and_delete import check_for_parking_tag

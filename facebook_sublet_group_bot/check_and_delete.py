@@ -208,9 +208,13 @@ def get_tags(message_text):
     split = message_text.strip().split(" ")
 
     if not p.match(split[0]) and split[0] not in allowed_leading_characters:
-        return []
+        return None
 
-    return [l[1:-1] for l in split for m in (p.search(l),) if m]
+    tags_list = [l[1:-1] for l in split for m in (p.search(l),) if m]
+    if len(tags_list) > 0:
+        return tags_list
+    else:
+        return None
 
 
 # Method for checking if pricing reference is there
@@ -389,8 +393,9 @@ def sub_group():
             valid_post = False
             log('----$', Color.BLUE)
 
-        # Check for tag validity
-        if not get_tags(post_message) > 0:
+        # Check for tag validity, including tags that say rooming and offering
+        tags = get_tags(post_message)
+        if not tags or ('rooming' in tags and 'offering' in tags):
             valid_post = False
             log('----Tag', Color.BLUE)
 

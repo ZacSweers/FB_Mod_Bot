@@ -31,6 +31,11 @@ def load_properties():
 
 
 def test():
+
+    # Check to see if we're running on Heroku, skip if we aren't
+    if not os.environ.get('MEMCACHEDCLOUD_SERVERS', None):
+        return True
+
     # Load the properties
     saved_props = load_properties()
 
