@@ -210,7 +210,7 @@ def get_tags(message_text):
     if not p.match(split[0]) and split[0] not in allowed_leading_characters:
         return None
 
-    tags_list = [l[1:-1] for l in split for m in (p.search(l),) if m]
+    tags_list = [l.lower()[1:-1] for l in split for m in (p.search(l),) if m]
     if len(tags_list) > 0:
         return tags_list
     else:
@@ -394,14 +394,14 @@ def sub_group():
         log("--Checking price", Color.BLUE)
         if not check_price_validity(post_message):
             valid_post = False
-            log('----$', Color.BLUE)
+            log('----$', Color.RED)
 
         # Check for tag validity, including tags that say rooming and offering
         log("--Checking tags", Color.BLUE)
         tags = get_tags(post_message)
         if not tags or ('rooming' in tags and 'offering' in tags):
             valid_post = False
-            log('----Tag', Color.BLUE)
+            log('----Tag', Color.RED)
 
         # Check post length.
         # Allow short ones if there's a craigslist link or parking
@@ -410,7 +410,7 @@ def sub_group():
                         "craigslist" not in post_message.lower() \
                 and not check_for_parking_tag(post_message):
             valid_post = False
-            log('----Length', Color.BLUE)
+            log('----RED', Color.BLUE)
 
         # Not a valid post
         if not valid_post:
