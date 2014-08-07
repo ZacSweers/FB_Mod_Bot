@@ -373,6 +373,8 @@ def sub_group():
         post_message = post['message']  # Content of the post
         post_id = post['post_id']  # Unique ID of the post
 
+        log("--Checking " + post_id, Color.BLUE)
+
         # Unique ID of the person that posted it
         actor_id = post['actor_id']
 
