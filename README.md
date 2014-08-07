@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/pandanomic/FB_Mod_Bot.svg?branch=master)](https://travis-ci.org/pandanomic/FB_Mod_Bot)
 Facebook Mod Bot
 ================
 
