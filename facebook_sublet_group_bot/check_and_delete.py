@@ -476,6 +476,8 @@ if __name__ == "__main__":
                 if response.lower() == 'y':
                     log("Flushing cache for valid", Color.BLUE)
                     cache = save_cache(valid_db, [])
+                    log("Flushed cache", Color.BLUE)
+                sys.exit()
             else:
                 sys.exit('No valid args specified')
 
