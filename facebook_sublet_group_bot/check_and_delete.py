@@ -471,6 +471,11 @@ if __name__ == "__main__":
                     sys.exit(a + " doesn't exist in props")
                 print props[a]
                 sys.exit()
+            elif o in ("-f", "--flushvalid"):
+                response = raw_input("Are you sure? Y/N")
+                if response.lower() == 'y':
+                    log("Flushing cache for valid", Color.BLUE)
+                    cache = save_cache(valid_db, [])
             else:
                 sys.exit('No valid args specified')
 
