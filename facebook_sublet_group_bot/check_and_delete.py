@@ -391,11 +391,13 @@ def sub_group():
         #     str(post_id) + "\n--ACTOR ID: " + str(actor_id))
 
         # Check for pricing
+        log("--Checking price", Color.BLUE)
         if not check_price_validity(post_message):
             valid_post = False
             log('----$', Color.BLUE)
 
         # Check for tag validity, including tags that say rooming and offering
+        log("--Checking tags", Color.BLUE)
         tags = get_tags(post_message)
         if not tags or ('rooming' in tags and 'offering' in tags):
             valid_post = False
@@ -403,6 +405,7 @@ def sub_group():
 
         # Check post length.
         # Allow short ones if there's a craigslist link or parking
+        log("--Checking length", Color.BLUE)
         if len(post_message) < 200 and \
                         "craigslist" not in post_message.lower() \
                 and not check_for_parking_tag(post_message):
@@ -412,6 +415,8 @@ def sub_group():
         # Not a valid post
         if not valid_post:
             graph.delete(post_id)
+        else:
+            valid_posts.append(post_id)
 
     # # Delete posts older than 30 days
     delete_old_posts(graph, group_id, admin_ids)
