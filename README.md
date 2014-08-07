@@ -12,7 +12,7 @@ This is a facebook bot that I wrote to moderate a group I admin, essentially kee
 
 Anyone is welcome to use this code and/or repurpose it for their own use. All I ask is that you give me credit somewhere :)
 
-The bot is written in Python, using the [facebook-sdk](https://github.com/pythonforfacebook/facebook-sdk) API wrapper for Facebook's graph API. To make the bot functional and separate from my personal account, I created a dedicated Facebook account for my bot (literally called "Sublets Bot"), registered it as a developer, created an app, granted that same app full permissions to the account, and finally use that access token in the bot itself to authenticate with Facebook's Graph API.
+The bot is written in Python, using the [facepy](https://github.com/jgorset/facepy) API wrapper for Facebook's graph API. To make the bot functional and separate from my personal account, I created a dedicated Facebook account for my bot (literally called "Sublets Bot"), registered it as a developer, created an app, granted that same app full permissions to the account, and finally use that access token in the bot itself to authenticate with Facebook's Graph API.
 
   * *Why make a dedicated app instead of just creating an access token? Because only an app (with an app ID and secret key) can programatically request an extended access token. If I don't do that, I'd have to manually generate a new one every two hours.* 
 
