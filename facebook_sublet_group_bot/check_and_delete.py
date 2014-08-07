@@ -428,9 +428,9 @@ def sub_group():
 if __name__ == "__main__":
 
     try:
-      opts, args = getopt.getopt(sys.argv[1:], "pesu:n:v:g:", ["printprops", "extend", "setprops", "token=", "propname=", "propvalue=", "propname="])
+      opts, args = getopt.getopt(sys.argv[1:], "fpesu:n:v:g:", ["flushvalid", "printprops", "extend", "setprops", "token=", "propname=", "propvalue=", "propname="])
     except getopt.GetoptError:
-      print 'check_and_delete.py -p -e -s -u <token> -n <propname> -v <propvalue> -g <propname>'
+      print 'check_and_delete.py -f -p -e -s -u <token> -n <propname> -v <propvalue> -g <propname>'
       sys.exit(2)
 
     # Check to see if we're running on Heroku
