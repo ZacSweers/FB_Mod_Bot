@@ -5,4 +5,4 @@ python:
 # command to install dependencies
 install: "pip install -r requirements.txt"
 # command to run tests
-script: facebook_sublet_group_bot/test
+script: python facebook_sublet_group_bot/test.py
