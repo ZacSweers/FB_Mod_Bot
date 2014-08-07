@@ -207,6 +207,7 @@ def get_tags(message_text):
 
     split = message_text.strip().split(" ")
 
+    # Check that they're on the first line
     if not p.match(split[0]) and split[0] not in allowed_leading_characters:
         return None
 
@@ -399,7 +400,7 @@ def sub_group():
         # Check for tag validity, including tags that say rooming and offering
         log("--Checking tags", Color.BLUE)
         tags = get_tags(post_message)
-        if not tags or ('rooming' in tags and 'offering' in tags):
+        if not tags:
             valid_post = False
             log('----Tag', Color.RED)
 
