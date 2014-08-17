@@ -206,6 +206,25 @@ def update_prop(propname, value):
 
 
 # Method for checking tag validity
+def get_tags_old(message_text):
+    p = re.compile(
+        "^(-|\*| )*([\(\[\{])((looking)|(rooming)|(offering)|(parking))([\)\]\}])(:)?(\s|$)",
+        re.IGNORECASE)
+
+    split = message_text.strip().split(" ")
+
+    # Check that they're on the first line
+    if not p.match(split[0]) and split[0] not in allowed_leading_characters:
+        return None
+
+    tags_list = [l.lower()[1:-1] for l in split for m in (p.search(l),) if m]
+    if len(tags_list) > 0:
+        return tags_list
+    else:
+        return None
+
+
+# Method for checking tag validity
 def get_tags(message_text):
     p = re.compile(
         r"^(-|\*| )*(([\(\[\{])(.+)([\)\]\}]))+(:)?(\s|$)",
@@ -410,7 +429,7 @@ def sub_group():
             invalid_count += 1
 
         # Check for tag validity, including tags that say rooming and offering
-        tags = get_tags(post_message)
+        tags = get_tags_old(post_message)
         if not tags:
             valid_post = False
             log('----Tag', Color.RED)
