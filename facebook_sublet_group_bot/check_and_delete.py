@@ -229,8 +229,7 @@ def get_tags(message_text):
     tags_list = [re.sub(r"^(-|\*| )*", "", full_tag.lower())[1:(-2 if full_tag[-1] == ":" else -1)] for full_tag in firstline_split for matched in (p.search(full_tag),) if matched]
 
     # Should really learn how to do python's builtin logging...
-    if running_on_heroku:
-        log('--Tags: ' + ', '.join(tags_list), Color.BLUE)
+    # log('--Tags: ' + ', '.join(tags_list), Color.BLUE)
 
     if len(tags_list) > 0 and set(tags_list).issubset(allowed_tags):
         return tags_list
