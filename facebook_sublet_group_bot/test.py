@@ -1,25 +1,12 @@
 import os
-import pickle
 import sys
-import subprocess
+from util import notify_mac
+import unittest
 
 __author__ = 'Henri Sweers'
 
-import unittest
 
-
-# Nifty method for sending notifications on my mac when it's done
-def notify_mac():
-    if sys.platform == "darwin":
-        try:
-            subprocess.call(
-                ["terminal-notifier", "-message", "Tests done", "-title",
-                 "FB_Bot", "-sound", "default"])
-        except OSError:
-            print "If you have terminal-notifier, this would be a notification"
-
-
-class TestTagValidity(unittest.TestCase):
+class test_tag_validity(unittest.TestCase):
 
     def setUp(self):
         self.test_tags = ["Looking", "Rooming", "Offering", "Parking"]
@@ -40,6 +27,22 @@ class TestTagValidity(unittest.TestCase):
             self.assertFalse(get_tags(tag + ")"))
             self.assertFalse(get_tags("{" + tag))
             self.assertFalse(get_tags(tag))
+
+    def test_real(self):
+        from check_and_delete import get_tags
+        from util import read_lines
+        with open("test_good_posts.txt") as f:
+            posts = [post for post in read_lines(f, "<END>\n")]
+        for post in posts:
+            self.assertTrue(get_tags(post))
+
+    def test_real_bad(self):
+        from check_and_delete import get_tags
+        from util import read_lines
+        with open("test_bad_posts.txt") as f:
+            posts = [post for post in read_lines(f, "<END>\n")]
+        for post in posts:
+            self.assertFalse(get_tags(post))
 
     def test_bad(self):
         from check_and_delete import get_tags
@@ -96,7 +99,7 @@ class TestTagValidity(unittest.TestCase):
         self.assertTrue(check_for_parking_tag("(" + tag + ") :"))
 
 
-class TestPriceValidity(unittest.TestCase):
+class test_price_validity(unittest.TestCase):
     def setUp(self):
         self.junk = """here's some other text because yeah more text to
             to illustrate lots more text here in the rest of the post"""
@@ -198,7 +201,7 @@ class TestPriceValidity(unittest.TestCase):
         self.assertTrue(check_price_validity("Blah blah 300amo"))
 
 
-class TestDeletion(unittest.TestCase):
+class test_deletion(unittest.TestCase):
 
     def test_regular(self):
         import delete_test
@@ -216,7 +219,6 @@ class TestDeletion(unittest.TestCase):
 
 
 def main():
-    print ""
     print "-----------------"
     print "| Running tests |"
     print "-----------------"

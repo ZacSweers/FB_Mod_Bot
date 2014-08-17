@@ -7,10 +7,9 @@ import datetime
 import facepy
 import getopt
 import time
-import subprocess
 import sys
 import re
-from util import log, Color
+from util import log, Color, notify_mac
 
 __author__ = 'Henri Sweers'
 
@@ -164,17 +163,6 @@ def save_cache(cachename, data):
         with open(cachename, 'w+') as f:
             pickle.dump(data, f)
 
-
-# Nifty method for sending notifications on my mac when it's done
-def notify_mac():
-    if sys.platform == "darwin":
-        try:
-            subprocess.call(
-                ["terminal-notifier", "-message", "Done", "-title", "FB_Bot",
-                 "-sound", "default"])
-        except OSError:
-            print "If you have terminal-notifier, this would be a notification"
-
 # Manually update API token
 def update_token(token):
     log("Updating token", Color.BLUE)
@@ -232,13 +220,13 @@ def get_tags(message_text):
 
     # Insert space between two consecutive tags
     message_text = re.sub(r"([\)\]\}])([\(\[\{])", r"\1 \2", message_text)
-    split = message_text.strip().split(" ")
+    firstline_split = message_text.split("\n")[0].strip().split()
 
     # Check that they're on the first line
-    if not p.match(split[0]) and split[0] not in allowed_leading_characters:
+    if not p.match(firstline_split[0]) and firstline_split[0] not in allowed_leading_characters:
         return None
 
-    tags_list = [re.sub(r"^(-|\*| )*", "", l.lower())[1:(-2 if l[-1] == ":" else -1)] for l in split for m in (p.search(l),) if m]
+    tags_list = [re.sub(r"^(-|\*| )*", "", full_tag.lower())[1:(-2 if full_tag[-1] == ":" else -1)] for full_tag in firstline_split for matched in (p.search(full_tag),) if matched]
 
     # Should really learn how to do python's builtin logging...
     if running_on_heroku:
@@ -429,7 +417,7 @@ def sub_group():
             invalid_count += 1
 
         # Check for tag validity, including tags that say rooming and offering
-        tags = get_tags_old(post_message)
+        tags = get_tags(post_message)
         if not tags:
             valid_post = False
             log('----Tag', Color.RED)
