@@ -37,6 +37,9 @@ running_on_heroku = False
 # Tags: allowed leading characters
 allowed_leading_characters = ('*', '-')
 
+# Tags: allowed tags
+allowed_tags = {'looking', 'offering', 'parking', 'rooming'}
+
 
 # Junk method that I use for testing stuff periodically
 def test():
@@ -202,17 +205,24 @@ def update_prop(propname, value):
 # Method for checking tag validity
 def get_tags(message_text):
     p = re.compile(
-        "^(-|\*| )*([\(\[\{])((looking)|(rooming)|(offering)|(parking))([\)\]\}])(:)?(\s|$)",
+        r"^(-|\*| )*(([\(\[\{])(.+)([\)\]\}]))+(:)?(\s|$)",
         re.IGNORECASE)
 
+    # Insert space between two consecutive tags
+    message_text = re.sub(r"([\)\]\}])([\(\[\{])", r"\1 \2", message_text)
     split = message_text.strip().split(" ")
 
     # Check that they're on the first line
     if not p.match(split[0]) and split[0] not in allowed_leading_characters:
         return None
 
-    tags_list = [l.lower()[1:-1] for l in split for m in (p.search(l),) if m]
-    if len(tags_list) > 0:
+    tags_list = [re.sub(r"^(-|\*| )*", "", l.lower())[1:(-2 if l[-1] == ":" else -1)] for l in split for m in (p.search(l),) if m]
+
+    # Should really learn how to do python's builtin logging...
+    if running_on_heroku:
+        log('--Tags: (' + ', '.join(tags_list) + ')', Color.BLUE)
+
+    if len(tags_list) > 0 and set(tags_list).issubset(allowed_tags):
         return tags_list
     else:
         return None

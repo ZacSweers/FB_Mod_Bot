@@ -23,6 +23,7 @@ class TestTagValidity(unittest.TestCase):
 
     def setUp(self):
         self.test_tags = ["Looking", "Rooming", "Offering", "Parking"]
+        self.bad_tags = ["blah", "test", "sublease"]
         self.junk = """here's some other text because yeah more text to
             to illustrate lots more text here in the rest of the post"""
 
@@ -40,6 +41,21 @@ class TestTagValidity(unittest.TestCase):
             self.assertFalse(get_tags("{" + tag))
             self.assertFalse(get_tags(tag))
 
+    def test_bad(self):
+        from check_and_delete import get_tags
+        for tag in self.bad_tags:
+            self.assertFalse(get_tags("(" + tag + ")"))
+            self.assertFalse(get_tags("{" + tag + "}"))
+            self.assertFalse(get_tags("{" + tag + "}{looking}"))
+            self.assertFalse(get_tags("[" + tag + "]"))
+            self.assertFalse(get_tags("(" + tag + "]"))
+            self.assertFalse(get_tags("{" + tag + "]"))
+            self.assertFalse(get_tags("(" + tag + "}"))
+            self.assertFalse(get_tags("{" + tag + ")"))
+            self.assertFalse(get_tags(tag + ")"))
+            self.assertFalse(get_tags("{" + tag))
+            self.assertFalse(get_tags(tag))
+
     def test_misc(self):
         from check_and_delete import get_tags
         for tag in self.test_tags:
@@ -53,7 +69,7 @@ class TestTagValidity(unittest.TestCase):
             self.assertTrue(get_tags(" (" + tag + ")"))
             self.assertTrue(get_tags("(" + tag + "):"))
             self.assertTrue(get_tags("(" + tag + ") :"))
-            self.assertFalse(get_tags("(" + tag + ")(" + tag + ")"))
+            self.assertTrue(get_tags("(" + tag + ")(" + tag + ")"))
 
     def test_parking(self):
         from check_and_delete import check_for_parking_tag
