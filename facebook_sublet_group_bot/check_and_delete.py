@@ -31,6 +31,9 @@ prop_file = "login_prop"
 # Boolean for key extensions
 extend_key = False
 
+# Dry run to disable deletions on a run
+dry_run = False
+
 # Boolean for checking heroku
 running_on_heroku = False
 
@@ -220,7 +223,7 @@ def get_tags(message_text):
 
     # Should really learn how to do python's builtin logging...
     if running_on_heroku:
-        log('--Tags: (' + ', '.join(tags_list) + ')', Color.BLUE)
+        log('--Tags: ' + ', '.join(tags_list), Color.BLUE)
 
     if len(tags_list) > 0 and set(tags_list).issubset(allowed_tags):
         return tags_list
@@ -309,7 +312,7 @@ def delete_old_posts(graph, group_id, admin_ids):
         print post_id
         graph.delete(post_id)
         deleted_posts_count += 1
-    log("Deleted " + str(deleted_posts_count) + " posts", Color.RED)
+    log("Deleted " + str(deleted_posts_count) + " old posts", Color.RED)
 
 
 # Main runner method
@@ -376,6 +379,7 @@ def sub_group():
     log("Checking valid cache.", Color.BOLD)
     valid_posts = load_cache(valid_db, valid_posts)
     log('--Valid cache size: ' + str(len(valid_posts)), Color.BOLD)
+    invalid_count = 0
 
     # Loop over retrieved posts
     for post in group_posts["data"]:
@@ -403,12 +407,14 @@ def sub_group():
         if not check_price_validity(post_message):
             valid_post = False
             log('----$', Color.RED)
+            invalid_count += 1
 
         # Check for tag validity, including tags that say rooming and offering
         tags = get_tags(post_message)
         if not tags:
             valid_post = False
             log('----Tag', Color.RED)
+            invalid_count += 1
 
         # Check post length.
         # Allow short ones if there's a craigslist link or parking
@@ -416,13 +422,22 @@ def sub_group():
                         "craigslist" not in post_message.lower() \
                 and not check_for_parking_tag(post_message):
             valid_post = False
-            log('----RED', Color.BLUE)
+            log('----Length', Color.RED)
+            invalid_count += 1
 
         # Not a valid post
         if not valid_post:
-            graph.delete(post_id)
+            if dry_run:
+                log("Dry - invalid deletion", Color.RED)
+                log("--ID: " + post_id, Color.RED)
+                log("--Message: " + post_message, Color.RED)
+            else:
+                graph.delete(post_id)
         else:
             valid_posts.append(post_id)
+
+    if not dry_run:
+        log("Deleted " + str(invalid_count) + " invalid posts", Color.RED)
 
     # # Delete posts older than 30 days
     delete_old_posts(graph, group_id, admin_ids)
@@ -441,9 +456,9 @@ def sub_group():
 if __name__ == "__main__":
 
     try:
-      opts, args = getopt.getopt(sys.argv[1:], "fpesu:n:v:g:", ["flushvalid", "printprops", "extend", "setprops", "token=", "propname=", "propvalue=", "propname="])
+      opts, args = getopt.getopt(sys.argv[1:], "fdpesu:n:v:g:", ["flushvalid", "dry", "printprops", "extend", "setprops", "token=", "propname=", "propvalue=", "propname="])
     except getopt.GetoptError:
-      print 'check_and_delete.py -f -p -e -s -u <token> -n <propname> -v <propvalue> -g <propname>'
+      print 'check_and_delete.py -f -d -p -e -s -u <token> -n <propname> -v <propvalue> -g <propname>'
       sys.exit(2)
 
     # Check to see if we're running on Heroku
@@ -462,6 +477,8 @@ if __name__ == "__main__":
         for o, a in opts:
             if o in ("-e", "--extend"):
                 extend_key = True
+            if o in ("-d", "--dry"):
+                dry_run = True
             elif o in ("-s", "--setprops"):
                 set_new_props()
                 sys.exit()
