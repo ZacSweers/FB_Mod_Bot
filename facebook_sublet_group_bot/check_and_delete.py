@@ -243,8 +243,10 @@ def get_tags(message_text):
 # Can't have "rooming" AND "offering". These people are usually just misusing the rooming tag
 def validate_tags(tags):
     if not tags:
+        log('----Empty tags', Color.RED)
         return False
     elif "rooming" in tags and "offering" in tags:
+        log('----Rooming and offering', Color.RED)
         return False
     else:
         return True
