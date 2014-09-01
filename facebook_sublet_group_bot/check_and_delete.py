@@ -13,7 +13,7 @@ from util import log, Color, notify_mac
 
 __author__ = 'Henri Sweers'
 
-############## Global vars ##############
+# ############# Global vars ##############
 
 # 24 hours, in seconds
 time_limit = 86400
@@ -163,6 +163,7 @@ def save_cache(cachename, data):
         with open(cachename, 'w+') as f:
             pickle.dump(data, f)
 
+
 # Manually update API token
 def update_token(token):
     log("Updating token", Color.BLUE)
@@ -176,6 +177,7 @@ def update_token(token):
         log("Token updated, you should now extend it", Color.BLUE)
     except:
         log("Invalid token", Color.RED)
+
 
 # Set a property by name
 def update_prop(propname, value):
@@ -226,7 +228,8 @@ def get_tags(message_text):
     if not p.match(firstline_split[0]) and firstline_split[0] not in allowed_leading_characters:
         return None
 
-    tags_list = [re.sub(r"^(-|\*| )*", "", full_tag.lower())[1:(-2 if full_tag[-1] == ":" else -1)] for full_tag in firstline_split for matched in (p.search(full_tag),) if matched]
+    tags_list = [re.sub(r"^(-|\*| )*", "", full_tag.lower())[1:(-2 if full_tag[-1] == ":" else -1)] for full_tag in
+                 firstline_split for matched in (p.search(full_tag),) if matched]
 
     # Should really learn how to do python's builtin logging...
     # log('--Tags: ' + ', '.join(tags_list), Color.BLUE)
@@ -235,6 +238,16 @@ def get_tags(message_text):
         return tags_list
     else:
         return None
+
+
+# Can't have "rooming" AND "offering". These people are usually just misusing the rooming tag
+def validate_tags(tags):
+    if not tags:
+        return False
+    elif "rooming" in tags and "offering" in tags:
+        return False
+    else:
+        return True
 
 
 # Method for checking if pricing reference is there
@@ -417,7 +430,7 @@ def sub_group():
 
         # Check for tag validity, including tags that say rooming and offering
         tags = get_tags(post_message)
-        if not tags:
+        if validate_tags(tags):
             valid_post = False
             log('----Tag', Color.RED)
             invalid_count += 1
@@ -462,10 +475,12 @@ def sub_group():
 if __name__ == "__main__":
 
     try:
-      opts, args = getopt.getopt(sys.argv[1:], "fdpesu:n:v:g:", ["flushvalid", "dry", "printprops", "extend", "setprops", "token=", "propname=", "propvalue=", "propname="])
+        opts, args = getopt.getopt(sys.argv[1:], "fdpesu:n:v:g:",
+                                   ["flushvalid", "dry", "printprops", "extend", "setprops", "token=", "propname=",
+                                    "propvalue=", "propname="])
     except getopt.GetoptError:
-      print 'check_and_delete.py -f -d -p -e -s -u <token> -n <propname> -v <propvalue> -g <propname>'
-      sys.exit(2)
+        print 'check_and_delete.py -f -d -p -e -s -u <token> -n <propname> -v <propvalue> -g <propname>'
+        sys.exit(2)
 
     # Check to see if we're running on Heroku
     if os.environ.get('MEMCACHEDCLOUD_SERVERS', None):
@@ -475,7 +490,7 @@ if __name__ == "__main__":
 
         # Authenticate Memcached
         running_on_heroku = True
-        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').split(','),os.environ.get('MEMCACHEDCLOUD_USERNAME'),os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
+        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').split(','), os.environ.get('MEMCACHEDCLOUD_USERNAME'), os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
 
     propname = None
     propval = None

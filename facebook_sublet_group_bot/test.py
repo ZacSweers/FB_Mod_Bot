@@ -6,7 +6,7 @@ import unittest
 __author__ = 'Henri Sweers'
 
 
-class test_tag_validity(unittest.TestCase):
+class TestTagValidity(unittest.TestCase):
 
     def setUp(self):
         self.test_tags = ["Looking", "Rooming", "Offering", "Parking"]
@@ -30,18 +30,14 @@ class test_tag_validity(unittest.TestCase):
 
     def test_real(self):
         from check_and_delete import get_tags
-        from util import read_lines
-        with open("test_good_posts.txt") as f:
-            posts = [post for post in read_lines(f, "<END>\n")]
-        for post in posts:
+        from TestPosts import good_posts
+        for post in good_posts:
             self.assertTrue(get_tags(post))
 
     def test_real_bad(self):
         from check_and_delete import get_tags
-        from util import read_lines
-        with open("test_bad_posts.txt") as f:
-            posts = [post for post in read_lines(f, "<END>\n")]
-        for post in posts:
+        from TestPosts import bad_posts
+        for post in bad_posts:
             self.assertFalse(get_tags(post))
 
     def test_bad(self):
@@ -98,8 +94,22 @@ class test_tag_validity(unittest.TestCase):
         self.assertTrue(check_for_parking_tag("(" + tag + "):"))
         self.assertTrue(check_for_parking_tag("(" + tag + ") :"))
 
+    def test_rooming_and_offering(self):
+        from check_and_delete import get_tags, validate_tags
+        self.assertFalse(validate_tags(get_tags("[rooming][offering]")))
+        self.assertFalse(validate_tags(get_tags("[rooming] [offering]")))
+        self.assertFalse(validate_tags(get_tags("[offering][rooming]")))
+        self.assertFalse(validate_tags(get_tags("[offering] [rooming]")))
+        self.assertFalse(validate_tags(get_tags("[offering] [rooming] [parking]")))
+        self.assertTrue(validate_tags(get_tags("[offering] [parking]")))
+        self.assertTrue(validate_tags(get_tags("[rooming] [looking]")))
+        self.assertTrue(validate_tags(get_tags("[rooming]")))
+        self.assertTrue(validate_tags(get_tags("[parking]")))
+        self.assertTrue(validate_tags(get_tags("[offering]")))
+        self.assertTrue(validate_tags(get_tags("[looking]")))
 
-class test_price_validity(unittest.TestCase):
+
+class TestPriceValidity(unittest.TestCase):
     def setUp(self):
         self.junk = """here's some other text because yeah more text to
             to illustrate lots more text here in the rest of the post"""
@@ -201,7 +211,7 @@ class test_price_validity(unittest.TestCase):
         self.assertTrue(check_price_validity("Blah blah 300amo"))
 
 
-class test_deletion(unittest.TestCase):
+class TestDeletion(unittest.TestCase):
 
     def test_regular(self):
         import delete_test
