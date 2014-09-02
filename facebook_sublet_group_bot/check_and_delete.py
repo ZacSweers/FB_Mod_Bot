@@ -108,8 +108,11 @@ def init_props():
     assert test_dict == saved_dict
 
 
-# Method for saving (with pickle) your prop values
 def save_properties(data):
+    """
+    Save props data into either memcache (heroku only) or pickle to local file
+    :param data: Dictionary of props data
+    """
     if running_on_heroku:
         mc.set('props', data)
     else:
@@ -117,8 +120,13 @@ def save_properties(data):
             pickle.dump(data, login_prop_file)
 
 
-# Method for loading (with pickle) your prop values
 def load_properties():
+    """
+    Load properties data from either memcache (heroku only) or local pickled file
+
+    :rtype : dict
+    :return: Dictionary of all the properties
+    """
     if running_on_heroku:
         obj = mc.get('props')
         if not obj:
