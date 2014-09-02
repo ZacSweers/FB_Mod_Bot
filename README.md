@@ -35,8 +35,6 @@ If any of those checks fail, it comments on the user notifying them of the probl
 * Improve documentation
 
 ### Caveats
-* Facebook's API doesn't allow you to delete anything that the app itself didn't create. 
-  * Therefore, you'll have to delete any other posts manually. Locally I have it set to just open the post-to-be-deleted in a new browser tab. On Heroku, I'll set up some form of sending those links back to me.
 * Depending on how many posts you request at once (the `LIMIT` option in FQL queries), Facebook's API periodically just crashes and returns an internal server error. Fortunately this doesn't seem to happen unless you ask for extremely high numbers.
 
 
