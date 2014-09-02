@@ -242,6 +242,7 @@ def get_tags(message_text):
 
 # Can't have "rooming" AND "offering". These people are usually just misusing the rooming tag
 def validate_tags(tags):
+    log('----Validating tags')
     if not tags:
         log('----Empty tags', Color.RED)
         return False
@@ -249,6 +250,7 @@ def validate_tags(tags):
         log('----Rooming and offering', Color.RED)
         return False
     else:
+        log('----Tag valid')
         return True
 
 
@@ -431,7 +433,10 @@ def sub_group():
             invalid_count += 1
 
         # Check for tag validity, including tags that say rooming and offering
+        log('--Checking tags, current valid val is ' + str(valid_post))
+        log('--Getting tags')
         tags = get_tags(post_message)
+        log('--Tags are: ' + ', '.join(tags))
         if validate_tags(tags):
             valid_post = False
             log('----Tag', Color.RED)
@@ -452,6 +457,7 @@ def sub_group():
                 log("Dry - invalid deletion", Color.RED)
                 log("--ID: " + post_id, Color.RED)
                 log("--Message: " + post_message, Color.RED)
+                log("\n\n")
             else:
                 graph.delete(post_id)
         else:
