@@ -31,7 +31,7 @@ If any of those checks fail, it comments on the user notifying them of the probl
 
 ### TODO
 * ~~Prepare for Heroku hosting~~ Done!
-* Automatically delete posts
+* ~~Automatically delete old posts~~ Done!
 * Improve documentation
 
 ### Caveats
