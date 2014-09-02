@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/pandanomic/FB_Mod_Bot.svg?branch=master)](https://travis-ci.org/pandanomic/FB_Mod_Bot)
+[![Build Status](https://travis-ci.org/hzsweers/FB_Mod_Bot.svg?branch=master)](https://travis-ci.org/hzsweers/FB_Mod_Bot)
 Facebook Mod Bot
 ================
 
@@ -6,7 +6,7 @@ Facebook Mod Bot
   <img src="http://i.imgur.com/xqpBTlg.png" alt="Sublet Bot" height="250" width="250"/>
 </p>
 
-**[Changelog](https://github.com/pandanomic/FB_Mod_Bot/blob/master/CHANGELOG.md)**
+**[Changelog](https://github.com/hzsweers/FB_Mod_Bot/blob/master/CHANGELOG.md)**
 
 This is a facebook bot that I wrote to moderate a group I admin, essentially keeping some order and upholding some requirements per the group rules. The main purpose is to crack down on vague/uninformative posts.
 
