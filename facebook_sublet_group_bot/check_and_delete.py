@@ -13,7 +13,7 @@ from util import log, Color, notify_mac
 
 __author__ = 'Henri Sweers'
 
-# ############# Global vars ##############
+############## Global vars ##############
 
 # 24 hours, in seconds
 time_limit = 86400
@@ -170,29 +170,29 @@ def update_token(token):
     graph = facepy.GraphAPI(token)
     try:
         graph.get('me/posts')
-        props = load_properties()
-        props['sublets_oauth_access_token'] = token
-        props['access_token_expiration'] = time.time() + 7200  # 2 hours buffer
-        save_properties(props)
+        props_dict = load_properties()
+        props_dict['sublets_oauth_access_token'] = token
+        props_dict['access_token_expiration'] = time.time() + 7200  # 2 hours buffer
+        save_properties(props_dict)
         log("Token updated, you should now extend it", Color.BLUE)
-    except:
-        log("Invalid token", Color.RED)
+    except Exception as e:
+        log("API error - " + e.message, Color.RED)
 
 
 # Set a property by name
-def update_prop(propname, value):
-    if propname in ("sublets_oauth_access_token", "access_token_expiration"):
+def update_prop(prop_name, value):
+    if prop_name in ("sublets_oauth_access_token", "access_token_expiration"):
         log("Please use -u or -e to update or extend tokens", Color.RED)
         return
-    log("Setting \"" + propname + "\" to \"" + value + "\"", Color.BLUE)
-    props = load_properties()
-    if propname not in props.keys():
-        response = raw_input("This key doesn't exist, do you want to add it? Y/N")
-        if (response.lower() != "y"):
+    log("Setting \"" + prop_name + "\" to \"" + value + "\"", Color.BLUE)
+    props_dict = load_properties()
+    if prop_name not in props_dict.keys():
+        input_response = raw_input("This key doesn't exist, do you want to add it? Y/N")
+        if input_response.lower() != "y":
             return
-    props[propname] = value
-    save_properties(props)
-    log("Done setting \"" + propname + "\"", Color.BLUE)
+    props_dict[prop_name] = value
+    save_properties(props_dict)
+    log("Done setting \"" + prop_name + "\"", Color.BLUE)
 
 
 # Method for checking tag validity
@@ -420,7 +420,7 @@ def sub_group():
 
         # Log the message details
         # log("\n" + post_message[0:75].replace('\n', "") + "...\n--POST ID: " +
-        #     str(post_id) + "\n--ACTOR ID: " + str(actor_id))
+        # str(post_id) + "\n--ACTOR ID: " + str(actor_id))
 
         # Check for pricing
         if not check_price_validity(post_message):
@@ -437,8 +437,8 @@ def sub_group():
 
         # Check post length.
         # Allow short ones if there's a craigslist link or parking
-        if len(post_message) < 200 and \
-                        "craigslist" not in post_message.lower() \
+        if len(post_message) < 200 \
+                and "craigslist" not in post_message.lower() \
                 and not check_for_parking_tag(post_message):
             valid_post = False
             log('----Length', Color.RED)
@@ -491,7 +491,8 @@ if __name__ == "__main__":
 
         # Authenticate Memcached
         running_on_heroku = True
-        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').split(','), os.environ.get('MEMCACHEDCLOUD_USERNAME'), os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
+        mc = bmemcached.Client(os.environ.get('MEMCACHEDCLOUD_SERVERS').split(','),
+                               os.environ.get('MEMCACHEDCLOUD_USERNAME'), os.environ.get('MEMCACHEDCLOUD_PASSWORD'))
 
     propname = None
     propval = None
@@ -527,7 +528,7 @@ if __name__ == "__main__":
                 response = raw_input("Are you sure? Y/N")
                 if response.lower() == 'y':
                     log("Flushing cache for valid", Color.BLUE)
-                    cache = save_cache(valid_db, [])
+                    save_cache(valid_db, [])
                     log("Flushed cache", Color.BLUE)
                 sys.exit()
             else:
