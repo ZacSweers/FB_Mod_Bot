@@ -450,7 +450,7 @@ def sub_group():
                 log("Dry - invalid deletion", Color.RED)
                 log("--ID: " + post_id, Color.RED)
                 log("--Message: " + post_message, Color.RED)
-                log("\n\n")
+                log("\n")
             else:
                 graph.delete(post_id)
         else:
