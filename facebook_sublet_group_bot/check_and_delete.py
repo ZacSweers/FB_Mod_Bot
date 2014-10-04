@@ -504,11 +504,12 @@ if __name__ == "__main__":
 
     propname = None
     propval = None
+    print opts
     if len(opts) != 0:
         for o, a in opts:
             if o in ("-e", "--extend"):
                 extend_key = True
-            if o in ("-d", "--dry"):
+            elif o in ("-d", "--dry"):
                 dry_run = True
             elif o in ("-s", "--setprops"):
                 set_new_props()
