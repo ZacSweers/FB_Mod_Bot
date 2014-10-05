@@ -504,7 +504,7 @@ if __name__ == "__main__":
 
     propname = None
     propval = None
-    print opts
+    log("Args - " + str(opts), Color.BOLD)
     if len(opts) != 0:
         for o, a in opts:
             if o in ("-e", "--extend"):
